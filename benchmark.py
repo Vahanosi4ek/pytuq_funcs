@@ -707,6 +707,41 @@ class Branin02(Function):
 		grad[:, 0, 1] = 2 * self._t1 - self._t2 * np.cos(x1) * np.sin(x2) + 1 / (x1 ** 2 + x2 ** 2 + self.c7) * 2 * x2
 		return grad
 
+class Brent(Function):
+	"""
+	Brent [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Brent]
+	"""
+	def __init__(self, c1=10., c2=10., name="Brent"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-10., 10.]))
+
+	def __call__(self, x):
+		r"""A 2-d multimodal function
+
+		.. math::
+			f(x)=(x_1 + 10)^2 + (x_2 + 10)^2 + e^{(-x_1^2-x_2^2)}
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+
+		Default constant values are :math:`c = (10., 10.)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		x1, x2 = x[:, 0], x[:, 1]
+		return ((x1 + self.c1) ** 2 + (x2 + self.c2) ** 2 + np.exp(-x1 ** 2 - x2 ** 2))[:, np.newaxis]
+
+	def grad(self, x):
+		x1, x2 = x[:, 0], x[:, 1]
+		return (2 * (x + self.c1) + np.exp(-x1 ** 2 - x2 ** 2)[:, np.newaxis] * -2 * x)[:, np.newaxis, :]
+
 # https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
 # excluding discontinuous functions
 
