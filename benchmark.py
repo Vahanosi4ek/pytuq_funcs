@@ -76,6 +76,7 @@ class SineSum2(Function):
 		return -np.sum(summation, axis=1, keepdims=True)
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		summation = np.zeros((x.shape[0], self.c1))
 		k = np.broadcast_to(np.arange(1, self.c1 + 1), (x.shape[0], self.c1))
 		summation += k * (k + 1) * np.cos((k + 1) * x + k)
@@ -115,6 +116,7 @@ class QuadxExp(Function):
 		return (-self._quad * self._exp)
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		return -(self._quad * -self._exp + self._exp * (2 * self.c1 * x + self.c2))[:, np.newaxis, :]
 
 class LinxSin(Function):
@@ -150,6 +152,7 @@ class LinxSin(Function):
 		return -self._linear * self._sine
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		return -(self._linear * self.c3 * np.cos(self.c3 * x) + self._sine * self.c2)[:, np.newaxis, :]
 
 class SinexExp(Function):
@@ -181,6 +184,7 @@ class SinexExp(Function):
 		return -self._sine * self._exp
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		return -(self._sine * (-self._exp * 2 * x) + self._exp * (np.cos(x) + 1))[:, np.newaxis, :]
 
 class SineLogSum(Function):
@@ -492,6 +496,7 @@ class AMGM(Function):
 		return (self._am - self._gm) ** 2
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		return (2 * (self._am - self._gm) * (1 / self.dim - 1 / self.dim * np.power((np.prod(x, axis=1, keepdims=True)), -1 / self.dim) * np.prod(x, axis=1, keepdims=True) / x))[:, np.newaxis, :]
 
 class BartelsConn(Function):
@@ -525,6 +530,7 @@ class BartelsConn(Function):
 		return (np.abs(self._t1) + np.abs(self._t2) + np.abs(self._t3))[:, np.newaxis]
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		x1, x2 = x[:, 0], x[:, 1]
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
 		grad[:, 0, 0] = np.sign(self._t1) * (2 * x1 + x2) + np.sign(self._t2) * np.cos(x1)
@@ -568,6 +574,7 @@ class Bird(Function):
 		return (self._t1 ** 2 + self._t2_1 * self._t2_2 + self._t3_1 * self._t3_2)[:, np.newaxis]
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		x1, x2 = x[:, 0], x[:, 1]
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
 		_t2_1_grad = self._t2_1 * 2 * (self.c1 - np.sin(x1)) * -np.cos(x1)
@@ -576,6 +583,128 @@ class Bird(Function):
 		_t3_2_grad = np.cos(x1)
 		grad[:, 0, 0] = 2 * self._t1 + self._t2_2 * _t2_1_grad + self._t3_1 * _t3_2_grad
 		grad[:, 0, 1] = -2 * self._t1 + self._t2_1 * _t2_2_grad + self._t3_2 * _t3_1_grad
+		return grad
+
+class Bohachevsky(Function):
+	"""
+	Bohachevsky [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Bohachevsky]
+	"""
+	def __init__(self, c1=2., c2=0.3, c3=3., c4=0.4, c5=4., c6=0.7, d=2, name="Bohachevsky"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.d = c1, c2, c3, c4, c5, c6, d
+		self.dim = d
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-15., 15.]))
+
+	def __call__(self, x):
+		r"""A N-d multimodal function
+
+		.. math::
+			f(x)=\sum_{i=1}^{n-1}\left[x_i^2 + c_1x_{i+1}^2 - c_2\cos(c_3\pi x_i) - c_4\cos(c_5\pi x_{i+1}) + c_6\right]
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,d)`.
+
+
+		Default constant values are :math:`c = (2., 0.3, 3., 0.4, 4., 0.7)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		x_shr = np.concatenate((x[:, 1:], x[:, :1]), axis=1)
+		inner = x ** 2 + self.c1 * x_shr ** 2 - self.c2 * np.cos(self.c3 * np.pi * x) - self.c4 * np.cos(self.c5 * np.pi * x_shr) + self.c6
+		return np.sum(inner[:, :-1], axis=1, keepdims=True)
+
+	def grad(self, x):
+		# Uses a trick where the first and last column cancel where we need them to.
+		x1 = np.concatenate((x[:, :-1], np.zeros((x.shape[0], 1))), axis=1)
+		x2 = np.concatenate((np.zeros((x.shape[0], 1)), x[:, 1:]), axis=1)
+		return (2 * x1 + self.c2 * self.c3 * np.pi * np.sin(self.c3 * np.pi * x1) + self.c1 * 2 * x2 + self.c4 * self.c5 * np.pi * np.sin(self.c5 * np.pi * x2))[:, np.newaxis, :]
+
+class Branin01(Function):
+	"""
+	Branin01 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Branin01]
+	"""
+	def __init__(self, c1=1.275, c2=5., c3=6., c4=10., c5=5., c6=4., c7=10., name="Branin01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7 = c1, c2, c3, c4, c5, c6, c7
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5., 10.], [0., 15.]]))
+
+	def __call__(self, x):
+		r"""A 2-d multimodal function
+
+		.. math::
+			f(x)=\left(-c_1 \frac{x_1^{2}}{\pi^{2}} + c_2 \frac{x_1}{\pi} + x_2 - c_3\right)^{2} + \left(c_4 - \frac{c_5}{c_6 \pi} \right) \cos\left(x_1\right) + c_7
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+
+		Default constant values are :math:`c = (1.275, 5., 6., 10., 5., 4., 10.)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		x1, x2 = x[:, 0], x[:, 1]
+		self._t1 = -self.c1 * x1 ** 2 / np.pi ** 2 + self.c2 * x1 / np.pi + x2 - self.c3
+		self._t2 = self.c4 - self.c5 / (self.c6 * np.pi)
+		return (self._t1 ** 2 + self._t2 * np.cos(x1) + self.c7)[:, np.newaxis]
+
+	def grad(self, x):
+		_ = self.__call__(x)
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		x1, x2 = x[:, 0], x[:, 1]
+		grad[:, 0, 0] = 2 * self._t1 * (-self.c1 * 2 / np.pi ** 2 * x1 + self.c2 / np.pi) - self._t2 * np.sin(x1)
+		grad[:, 0, 1] = 2 * self._t1
+		return grad
+
+class Branin02(Function):
+	"""
+	Branin02 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Branin02]
+	"""
+	def __init__(self, c1=1.275, c2=5., c3=6., c4=10., c5=5., c6=4., c7=1., c8=10., name="Branin02"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7, self.c8 = c1, c2, c3, c4, c5, c6, c7, c8
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-5., 15.]))
+
+	def __call__(self, x):
+		r"""A 2-d multimodal function
+
+		.. math::
+			f(x)=\left(- c_1 \frac{x_1^{2}}{\pi^{2}} + c_2 \frac{x_1}{\pi} + x_2 -c_3\right)^{2} + \left(c_4 - \frac{c_5}{c_6 \pi} \right) \cos\left(x_1\right) \cos\left(x_2\right) + \log(x_1^2+x_2^2 +c_7) + c_8
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+
+		Default constant values are :math:`c = (1.275, 5., 6., 10., 5., 4., 1., 10.)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		x1, x2 = x[:, 0], x[:, 1]
+		self._t1 = -self.c1 * x1 ** 2 / np.pi ** 2 + self.c2 * x1 / np.pi + x2 - self.c3
+		self._t2 = self.c4 - self.c5 / (self.c6 * np.pi)
+		self._t3 = np.log(x1 ** 2 + x2 ** 2 + self.c7)
+		return (self._t1 ** 2 + self._t2 * np.cos(x1) * np.cos(x2) + self._t3 + self.c8)[:, np.newaxis]
+		return (self._t1 ** 2 + self._t2 * np.cos(x1) * np.cos(x2) + self.c8)[:, np.newaxis]
+
+	def grad(self, x):
+		_ = self.__call__(x)
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		x1, x2 = x[:, 0], x[:, 1]
+		grad[:, 0, 0] = 2 * self._t1 * (-self.c1 * 2 / np.pi ** 2 * x1 + self.c2 / np.pi) - self._t2 * np.cos(x2) * np.sin(x1) + 1 / (x1 ** 2 + x2 ** 2 + self.c7) * 2 * x1
+		grad[:, 0, 1] = 2 * self._t1 - self._t2 * np.cos(x1) * np.sin(x2) + 1 / (x1 ** 2 + x2 ** 2 + self.c7) * 2 * x2
 		return grad
 
 # https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
@@ -716,6 +845,7 @@ class DropWave(Function):
 		return -self._numerator / self._denominator
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		x1, x2 = x[:, 0], x[:, 1]
 		dist_sq = (x1 ** 2 + x2 ** 2)[:, np.newaxis]
 		num_grad = -np.sin(self.c2 * np.sqrt(dist_sq)) * self.c2 * x / np.sqrt(dist_sq)
@@ -758,6 +888,7 @@ class EggHolder(Function):
 		return (-self._term1_1 * self._term1_2 - self._term2)[:, np.newaxis]
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
 
 		x1, x2 = x[:, 0], x[:, 1]
@@ -787,7 +918,7 @@ class Griewank(Function):
 		r"""Griewank function, is large scale but has very frequent local minima
 
 		.. math::
-			f(x)=\sum_{i=1}^{d}\frac{x_i^2}{c1}-\prod_{i=1}^{d}\cos(\frac{x_i}{\sqrt{i}}) + c_2
+			f(x)=\sum_{i=1}^{d}\frac{x_i^2}{c_1}-\prod_{i=1}^{d}\cos(\frac{x_i}{\sqrt{i}}) + c_2
 
 
 		Default constant values are :math:`c = (4000., 1.)` and :math:`d = 2`.
@@ -807,6 +938,7 @@ class Griewank(Function):
 		return self._term1 - self._term2[:, np.newaxis] + self.c2
 
 	def grad(self, x):
+		_ = self.__call__(x)
 		term1_grad = 2 * x / self.c1
 		term2_grad = np.zeros((x.shape[0], self.dim))
 		for i in range(1, self.dim + 1):
@@ -841,7 +973,6 @@ class ChengSandu(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-
 		return (np.cos(x[:, 0] + x[:, 1]) * np.exp(x[:, 0] * x[:, 1]))[:, np.newaxis]
 
 	def grad(self, x):
@@ -914,7 +1045,6 @@ class Forrester(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-
 		return (self.c1 * x - self.c2) ** 2 * np.sin(self.c3 * x - self.c4)
 
 	def grad(self, x):

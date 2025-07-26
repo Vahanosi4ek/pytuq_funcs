@@ -14,48 +14,49 @@ from benchmark import *
 
 myrc()
 
-
 fcns = [
 # From https://infinity77.net/global_optimization/test_functions.html
 # 1D
-    # SineSum(),
-    # SineSum2(),
-    # QuadxExp(),
-    # LinxSin(),
-    # SinexExp(),
-    # SineLogSum(),
-    # CosineSum(),
-    # Sinex(),
-    # CosineSum2(),
+    SineSum(),
+    SineSum2(),
+    QuadxExp(),
+    LinxSin(),
+    SinexExp(),
+    SineLogSum(),
+    CosineSum(),
+    Sinex(),
+    CosineSum2(),
 
 # N-D test functions, alphabetically
-    # Ackley(),
-    # Adjiman(),
-    # Alpine01(),
-    # Alpine02(),
-    # AMGM(),
-    # BartelsConn(),
-    # Beale(),
+    Ackley(),
+    Adjiman(),
+    Alpine01(),
+    Alpine02(),
+    AMGM(),
+    BartelsConn(),
     Bird(),
+    Bohachevsky(),
+    Branin01(),
+    Branin02(),
 
 # Many local minima (it's worth running these with higher sample points)
-    # Bukin6(),
-    # CrossInTray(),
-    # DropWave(),
-    # EggHolder(),
-    # Griewank(),
+    Bukin6(),
+    CrossInTray(),
+    DropWave(),
+    EggHolder(),
+    Griewank(),
 
 # Trig
-    # ChengSandu(),
-    # Sine1d(),
-    # Forrester(),
-    # Friedman(),
-    # GramacyLee(),
-    # GramacyLee2(),
-    # Higdon(),
-    # Holsclaw(),
-    # Lim(),
-    # DampedCosine(),
+    ChengSandu(),
+    Sine1d(),
+    Forrester(),
+    Friedman(),
+    GramacyLee(),
+    GramacyLee2(),
+    Higdon(),
+    Holsclaw(),
+    Lim(),
+    DampedCosine(),
 ]
 
 for fcn in fcns:
