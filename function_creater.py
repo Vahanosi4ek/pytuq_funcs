@@ -7,6 +7,7 @@
 # 2. THE ONLY VARIABLES ARE c_..., x_..., or d
 # 3. Can't handle multi-variable numpy functions, and for customs you must make it like _frac in benchmark.py
 # 4. Can't handle summations, products, or anything involving x_i
+# 5. This code has a lot of weird hacky stuff which make no sense. It is not meant to be use for the long-term, just to make my life slightly easier
 
 class LexerState:
 	Other = 0
