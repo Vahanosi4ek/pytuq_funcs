@@ -793,11 +793,10 @@ class Brown(Function):
 
 class Bukin6(Function):
 	"""
-	Bukin No. 6 [https://www.sfu.ca/~ssurjano/bukin6.html]
+	Bukin6 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Bukin6]
 	"""
-	def __init__(self, c1=100., c2=0.01, c3=0.01, c4=10., name="Bukin6"):
+	def __init__(self, c1=100.0, c2=0.01, c3=0.01, c4=10.0, name="Bukin6"):
 		super().__init__()
-		self.name = name
 		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
 		self.dim = 2
 		self.outdim = 1
@@ -807,11 +806,11 @@ class Bukin6(Function):
 	def __call__(self, x):
 		r"""A nondifferentiable function which has many local minima
 
-		.. math::
-			f(x)=c_1\sqrt{\abs{x_2-c_2x_1^2}}+c_3\abs{x_1+c_4}
+		..math::
+			f(x)=c_1\sqrt{\abs{x_2-c_2 x_1^2}}+c_3\abs{x_1+c_4}
 
 
-		Default constant values are :math:`c = (100., 0.01, 0.01, 10.)`.
+		Default constant values are :math:`c = (100.0, 0.01, 0.01, 10.0)
 
 		Args:
 			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
@@ -819,10 +818,7 @@ class Bukin6(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-		t1 = self.c1 * np.sqrt(np.abs(x[:, 1] - self.c2 * x[:, 0] ** 2))
-		t2 = self.c3 * np.abs(x[:, 0] + self.c4)
-
-		return (t1 + t2)[:, np.newaxis] 
+		return (self.c1*np.sqrt(np.abs(x[:, 1]-self.c2*x[:, 0]**2.0))+self.c3*np.abs(x[:, 0]+self.c4)).reshape(-1, 1)
 
 	def grad(self, x):
 		x1 = x[:, 0]

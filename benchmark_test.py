@@ -32,7 +32,7 @@ fcns = [
     # Bird(),
     # Bohachevsky(),
     # Branin01(),
-    Branin02(),
+    # Branin02(),
     # Brent(),
     # Brown(),
 

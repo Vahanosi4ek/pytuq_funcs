@@ -2,12 +2,15 @@
 # Very useful to save time and avoid dumb errors, but it has limitations
 
 # Stuff to know:
-# 1. custom functions in benchmark.py which are used in the Lexer class should be prefixed with _
-# 1.5. Also, make sure to add that func name inside the Lexer __init__
+# 1. custom functions in benchmark.py which are used in the Translator class should be prefixed with _
+# 1.5. Also, make sure to add that func name inside the Translator __init__
 # 2. THE ONLY VARIABLES ARE c_..., x_..., or d
+# 2.5. Make sure the variables have spaces between them (won't work otherwise)
 # 3. Can't handle multi-variable numpy functions, and for customs you must make it like _frac in benchmark.py
 # 4. Can't handle summations, products, or anything involving x_i
 # 5. This code has a lot of weird hacky stuff which make no sense. It is not meant to be use for the long-term, just to make my life slightly easier
+
+import numpy as np
 
 class LexerState:
 	Other = 0
@@ -38,11 +41,11 @@ class Token:
 
 	__str__ = __repr__
 
-class Lexer:
+class Translator:
 	def __init__(self, func_str):
 		self.func_str = func_str
 
-		self.np_funcs = ("cos", "sin", "log", "pow", "exp")
+		self.np_funcs = ("cos", "sin", "log", "pow", "exp", "abs", "sqrt", "sign")
 		self.np_consts = ("pi")
 		self.custom_funcs = ("frac")
 
@@ -151,8 +154,57 @@ class Lexer:
 
 		return code
 
+def infinity77_create_class(name, consts, dim, outdim, domain_str,
+					description, latex):
+	consts1 = ""
+	for i, c in enumerate(consts):
+		consts1 += f"c{i + 1}={c}, "
+
+	consts2 = ""
+	for i, c in enumerate(consts):
+		consts2 += f"self.c{i + 1}" + (", " if i != len(consts) - 1 else " = ")
+	for i, c in enumerate(consts):
+		consts2 += f"c{i + 1}" + (", " if i != len(consts) - 1 else "")
+
+	consts3 = "("
+	for i, c in enumerate(consts):
+		consts3 += str(c) + (", " if i != len(consts) - 1 else ")")
+
+	translator = Translator(latex)
+	tokens = translator.get_tokens()
+	latex_code = translator.token_to_code(tokens)
+	print(tokens)
+	code = fr'''class {name}(Function):
+	"""
+	{name} [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.{name}]
+	"""
+	def __init__(self, {consts1}name="{name}"):
+		super().__init__()
+		self.name = name
+		{consts2}
+		self.dim = {dim}
+		self.outdim = {outdim}
+
+		self.setDimDom(domain={domain_str})
+
+	def __call__(self, x):
+		r"""{description}
+
+		..math::
+			f(x)={latex}
+
+
+		Default constant values are :math:`c = {consts3}
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,{dim})`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,{outdim})`.
+		"""
+		return ({latex_code}).reshape(-1, 1)'''
+
+	return code
+
 # For example
-str_ = r"(- c_1 \frac{x_1^{2}}{\pi^{2}} + c_2 \frac{x_1}{\pi} + x_2 -c_3)^{2} + (c_4 - \frac{c_5}{c_6 \pi} ) \cos(x_1) \cos(x_2) + \log(x_1^2+x_2^2 +c_7) + c_8"
-lexer = Lexer(str_)
-tokens = lexer.get_tokens()
-print(lexer.token_to_code(tokens))
+out = infinity77_create_class("Bukin6", (100., 0.01, 0.01, 10.), 2, 1, "np.array([[-15., -5.], [-3., 3.]])", "A nondifferentiable function which has many local minima", r"c_1\sqrt{\abs{x_2-c_2 x_1^2}}+c_3\abs{x_1+c_4}")
