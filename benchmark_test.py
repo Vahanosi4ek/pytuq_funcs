@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-"""[summary]
-
-[description]
-"""
-
 import sys
 import numpy as np
 
@@ -37,8 +32,9 @@ fcns = [
     # Bird(),
     # Bohachevsky(),
     # Branin01(),
-    # Branin02(),
-    Brent(),
+    Branin02(),
+    # Brent(),
+    # Brown(),
 
 # Many local minima (it's worth running these with higher sample points)
     # Bukin6(),

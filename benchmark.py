@@ -1,7 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import numpy as np
 from pytuq.func.func import Function
+
+# Useful specifically for function_creater.py to avoid parsing \frac{...}{...},
+# and instead we can just say _frac(...)(...)
+# I'm sorry for this code, but it makes my job a lot easier
+def _frac(a):
+	def _frac2(b):
+		return a / b
+	return _frac2
 
 # TODO: add complete support for discontinuous and nondifferentiable functions
 
@@ -697,7 +705,6 @@ class Branin02(Function):
 		self._t2 = self.c4 - self.c5 / (self.c6 * np.pi)
 		self._t3 = np.log(x1 ** 2 + x2 ** 2 + self.c7)
 		return (self._t1 ** 2 + self._t2 * np.cos(x1) * np.cos(x2) + self._t3 + self.c8)[:, np.newaxis]
-		return (self._t1 ** 2 + self._t2 * np.cos(x1) * np.cos(x2) + self.c8)[:, np.newaxis]
 
 	def grad(self, x):
 		_ = self.__call__(x)
@@ -741,6 +748,45 @@ class Brent(Function):
 	def grad(self, x):
 		x1, x2 = x[:, 0], x[:, 1]
 		return (2 * (x + self.c1) + np.exp(-x1 ** 2 - x2 ** 2)[:, np.newaxis] * -2 * x)[:, np.newaxis, :]
+
+class Brown(Function):
+	"""
+	Brown [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Brown]
+	"""
+	def __init__(self, c1=1., c2=1., d=4, name="Brown"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.d = c1, c2, d
+		self.dim = d
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-1., 1.]))
+
+	def __call__(self, x):
+		r"""A N-d multimodal function
+
+		.. math::
+			f(x)=\sum_{i=1}^{n-1}\left[ \left(x_i^2\right)^{x_{i+1}^2+c_1} + \left(x_{i+1}^2\right)^{x_i^2+c_2} \right]
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,d)`.
+
+
+		Default constant values are :math:`c = (-1., 4.)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		x_shr = np.concatenate((x[:, 1:], x[:, :1]), axis=1)
+		return np.sum(((x ** 2) ** (x_shr ** 2 + self.c1) + (x_shr ** 2) ** (x ** 2 + self.c2))[:, :-1], axis=1, keepdims=True)
+
+	def grad(self, x):
+		x1 = np.concatenate((x[:, :-1], np.zeros((x.shape[0], 1))), axis=1)
+		x2 = np.concatenate((np.zeros((x.shape[0], 1)), x[:, 1:]), axis=1)
+		grad = (x ** 2 + self.c1) * (x ** 2) ** (x ** 2 + self.c1 - 1) * 2 * x + (x ** 2 + self.c1) * (x2 ** 2) ** (x ** 2 +	 self.c1 - 1) * 2 * x
+		print(grad)
+		print(self.grad_(x))
+		return (grad)[:, np.newaxis, :]
 
 # https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
 # excluding discontinuous functions
