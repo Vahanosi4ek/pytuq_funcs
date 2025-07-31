@@ -12,6 +12,7 @@ class Tokens:
 	Num = "Num"
 	Var = "Var"
 	Func = "Func"
+	Const = "Const"
 
 	# End of function
 	EOF = "EOF"
@@ -29,6 +30,9 @@ class Token:
 class Lexer:
 	def __init__(self, func_str):
 		self.func_str = func_str
+
+		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "pow"}
+		self.consts = {"pi"}
 
 	def get_tokens(self):
 		s = self.func_str
@@ -97,7 +101,12 @@ class Lexer:
 			if c == "\\":
 				i += 1
 				name = read_while(lambda x: x.isalpha())
-				tokens.append(Token(Tokens.Func, name))
+				if name in self.funcs:
+					tokens.append(Token(Tokens.Func, name))
+				elif name in self.consts:
+					tokens.append(Token(Tokens.Const, name))
+				else:
+					raise Exception(f"Unknown function {name}. If it's a real numpy function or constant, add it into lexer.py in Lexer.__init__()")
 				continue
 
 			if c.isalpha():

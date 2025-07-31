@@ -1,8 +1,7 @@
 from lexer import *
 from parser import *
 
-# latex = r"(x_3^2 + 5) * 2"
-latex = r"x^{4+2}_{123456}"
+latex = r"2 + 5 * 3"
 lexer = Lexer(latex)
 tokens = lexer.get_tokens()
 

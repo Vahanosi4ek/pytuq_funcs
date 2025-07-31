@@ -1,18 +1,22 @@
 tiny:
 		Num
 		Var
+		Const
 		Lparen add_sub Rparen
-		Func Lparen add_sub Rparen
+		Func (suffix)? Lparen add_sub Rparen
+
+suffix:
+		(SubScript)? (char|(Lbrace add_sub Rbrace)) (SuperScript)? (char|(Lbrace add_sub Rbrace))
+		(SuperScript)? (char|(Lbrace add_sub Rbrace)) (SubScript)? (char|(Lbrace add_sub Rbrace))
 
 tiny_suffix:
-		tiny (SubScript)? (char|(Lbrace add_sub Rbrace)) (SuperScript)? (char|(Lbrace add_sub Rbrace))
-		tiny (SuperScript)? (char|(Lbrace add_sub Rbrace)) (SubScript)? (char|(Lbrace add_sub Rbrace))
+		tiny suffix
 
 simple:
-		(Add|Sub)* tiny
+		(Add|Sub)* tiny_suffix
 
 mul_div:
-		simple ((Mul|Div) simple)*
+		simple (((Mul|Div) simple)|tiny_suffix)*
 
 add_sub:
 		mul_div ((Add|Sub) mul_div)*

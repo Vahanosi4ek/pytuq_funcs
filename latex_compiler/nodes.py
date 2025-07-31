@@ -4,7 +4,7 @@ class UnaryOp:
 		self.node = node
 
 	def __repr__(self):
-		return f"UnaryOp[{self.op_tok}, {self.node}]"
+		return f"UnaryOp({self.op_tok}, {self.node})"
 
 	__str__ = __repr__
 
@@ -41,11 +41,22 @@ class VarNode:
 
 	__str__ = __repr__
 
-class SubSuperScriptNode:
-	def __init__(self, tok, sub_node=None, super_node=None):
-		self.tok = tok
-		self.sub_node = sub_node
-		self.super_node = super_node
+class SuffixNode:
+	def __init__(self, sub=None, super_=None):
+		self.sub = sub
+		self.super_ = super_
 
 	def __repr__(self):
-		return f"SubSuperScriptNode({self.tok}, {self.sub_node}, {self.super_node})"
+		return f"SuffixNode({self.sub}, {self.super_})"
+
+	__str__ = __repr__
+
+class SubSuperScriptNode:
+	def __init__(self, tok, suffix_node):
+		self.tok = tok
+		self.suffix_node = suffix_node
+
+	def __repr__(self):
+		return f"SubSuperScriptNode({self.tok}, {self.suffix_node.sub}, {self.suffix_node.super_})"
+
+	__str__ = __repr__

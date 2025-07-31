@@ -29,20 +29,29 @@ class Parser:
 		if tok.type == Tokens.Num:
 			self.advance()
 			return NumNode(tok)
+
+		if tok.type in (Tokens.Var, Tokens.Const):
+			self.advance()
+			return VarNode(tok)
+
 		if tok.type == Tokens.Lparen:
 			self.advance()
 			res = self.add_sub()
 			self.advance()
 			return res
-
-		if tok.type == Tokens.Var:
-			self.advance()
-			return VarNode(tok)
+		
+		if tok.type == Tokens.Func:
+			self.advance() # go to the left paren or sub/super script
+			if self.cur.type in (Tokens.SubScript, Tokens.SuperScript):
+				tok = SubSuperScriptNode(tok, self.suffix())
+			self.advance() # go to start of arg
+			arg = self.add_sub()
+			self.advance() # go past the right paren
+			return UnaryOp(tok, arg)
 
 		raise Exception(f"Unable to parse the tokens {self.tokens} at position {self.cur_i}")
 
-	def tiny_suffix(self):
-		left = self.tiny()
+	def suffix(self):
 		sub = None
 		super_ = None
 
@@ -85,7 +94,16 @@ class Parser:
 				self.advance()
 
 		if sub or super_:
-			return SubSuperScriptNode(left, sub, super_)
+			return SuffixNode(sub, super_)
+		else:
+			return None
+
+	def tiny_suffix(self):
+		left = self.tiny()
+		suffix = self.suffix()
+
+		if suffix:
+			return SubSuperScriptNode(left, suffix)
 		else:
 			return left
 
@@ -100,18 +118,30 @@ class Parser:
 		raise Exception(f"Unable to parse the tokens {self.tokens} at position {self.cur_i}")
 
 	def mul_div(self):
-		return self.binop(self.simple, (Tokens.Mul, Tokens.Div))
+		left = self.simple()
+
+		while True:
+			if self.cur.type in (Tokens.Mul, Tokens.Div):
+				op = self.cur
+				self.advance()
+				right = self.simple()
+			elif self.cur.type in (Tokens.Num, Tokens.Var, Tokens.Lparen, Tokens.Const, Tokens.Func):
+				op = Token(Tokens.Mul)
+				right = self.tiny_suffix()
+			else:
+				break
+			left = BinOp(left, op, right)
+
+		return left
+
 
 	def add_sub(self):
-		return self.binop(self.mul_div, (Tokens.Add, Tokens.Sub))
+		left = self.mul_div()
 
-	def binop(self, func, ops):
-		left = func()
-
-		while self.cur.type in ops:
+		while self.cur.type in (Tokens.Add, Tokens.Sub):
 			op = self.cur
 			self.advance()
-			right = func()
+			right = self.mul_div()
 			left = BinOp(left, op, right)
 
 		return left
