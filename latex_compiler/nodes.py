@@ -41,6 +41,23 @@ class VarNode:
 
 	__str__ = __repr__
 
+class FuncNode:
+	def __init__(self, tok):
+		self.tok = tok
+
+	def __repr__(self):
+		return f"VarNode({self.tok})"
+
+	__str__ = __repr__
+
+class FracNode:
+	def __init__(self, num, den):
+		self.num = num
+		self.den = den
+
+	def __repr__(self):
+		return f"FracNode({self.num}, {self.den})"
+
 class SuffixNode:
 	def __init__(self, sub=None, super_=None):
 		self.sub = sub
@@ -52,11 +69,11 @@ class SuffixNode:
 	__str__ = __repr__
 
 class SubSuperScriptNode:
-	def __init__(self, tok, suffix_node):
-		self.tok = tok
+	def __init__(self, node, suffix_node):
+		self.node = node
 		self.suffix_node = suffix_node
 
 	def __repr__(self):
-		return f"SubSuperScriptNode({self.tok}, {self.suffix_node.sub}, {self.suffix_node.super_})"
+		return f"SubSuperScriptNode({self.node}, {self.suffix_node.sub}, {self.suffix_node.super_})"
 
 	__str__ = __repr__

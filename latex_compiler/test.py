@@ -1,11 +1,14 @@
 from lexer import *
 from parser import *
+from codegen import *
 
-latex = r"2 + 5 * 3"
+latex = r"\frac{3xc_2}{2}"
 lexer = Lexer(latex)
 tokens = lexer.get_tokens()
 
 parser = Parser(tokens)
 ast = parser.parse()
 
-print(ast)
+code = codegen(ast)
+
+print(code)

@@ -41,13 +41,23 @@ class Parser:
 			return res
 		
 		if tok.type == Tokens.Func:
-			self.advance() # go to the left paren or sub/super script
-			if self.cur.type in (Tokens.SubScript, Tokens.SuperScript):
-				tok = SubSuperScriptNode(tok, self.suffix())
-			self.advance() # go to start of arg
-			arg = self.add_sub()
-			self.advance() # go past the right paren
-			return UnaryOp(tok, arg)
+			if tok.val == "frac":
+				self.advance()
+				self.advance()
+				num = self.add_sub()
+				self.advance()
+				self.advance()
+				den = self.add_sub()
+				self.advance()
+				return FracNode(num, den)
+			else:
+				self.advance() # go to the left paren or sub/super script
+				if self.cur.type in (Tokens.SubScript, Tokens.SuperScript):
+					tok = SubSuperScriptNode(FuncNode(tok), self.suffix())
+				self.advance() # go to start of arg
+				arg = self.add_sub()
+				self.advance() # go past the right paren
+				return UnaryOp(tok, arg)
 
 		raise Exception(f"Unable to parse the tokens {self.tokens} at position {self.cur_i}")
 

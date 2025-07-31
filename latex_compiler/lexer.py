@@ -29,9 +29,13 @@ class Token:
 
 class Lexer:
 	def __init__(self, func_str):
-		self.func_str = func_str
+		self.func_str = ""
 
-		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "pow"}
+		for c in func_str:
+			if c not in " \t\n":
+				self.func_str += c
+
+		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "frac"}
 		self.consts = {"pi"}
 
 	def get_tokens(self):
@@ -106,12 +110,12 @@ class Lexer:
 				elif name in self.consts:
 					tokens.append(Token(Tokens.Const, name))
 				else:
-					raise Exception(f"Unknown function {name}. If it's a real numpy function or constant, add it into lexer.py in Lexer.__init__()")
+					raise Exception(f"Unknown function {name}. If it's a real numpy function or constant, add it into lexer.py in Lexer.__init__ and in codegen in the funcdict")
 				continue
 
 			if c.isalpha():
-				name = read_while(lambda x: x.isalnum())
-				tokens.append(Token(Tokens.Var, name))
+				i += 1
+				tokens.append(Token(Tokens.Var, c))
 				continue
 
 			raise ValueError(f"Unexpected character '{c}' at position {i}")

@@ -5,6 +5,8 @@ tiny:
 		Lparen add_sub Rparen
 		Func (suffix)? Lparen add_sub Rparen
 
+		frac Lbrace add_sub Rbrace Lbrace add_sub Rbrace
+
 suffix:
 		(SubScript)? (char|(Lbrace add_sub Rbrace)) (SuperScript)? (char|(Lbrace add_sub Rbrace))
 		(SuperScript)? (char|(Lbrace add_sub Rbrace)) (SubScript)? (char|(Lbrace add_sub Rbrace))
