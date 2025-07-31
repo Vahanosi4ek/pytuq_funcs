@@ -34,10 +34,16 @@ fcns = [
     # Branin01(),
     # Branin02(),
     # Brent(),
-    # Brown(),
+    # Bukin02(),
+    # Bukin04(),
+    # Bukin6(),
+    # CarromTable(),
+    # Chichinadze(),
+    # Cigar(),
+    # Colville(),
+    # CosineMixture(),
 
 # Many local minima (it's worth running these with higher sample points)
-    # Bukin6(),
     # CrossInTray(),
     # DropWave(),
     # EggHolder(),

@@ -509,7 +509,7 @@ class AMGM(Function):
 
 class BartelsConn(Function):
 	"""
-	BartelsConn [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.BartelsConn]
+	BartelsConn [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.BartelsConn]
 	"""
 	def __init__(self, name="BartelsConn"):
 		super().__init__()
@@ -547,7 +547,7 @@ class BartelsConn(Function):
 
 class Bird(Function):
 	"""
-	Bird [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Bird]
+	Bird [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Bird]
 	"""
 	def __init__(self, c1=1., c2=1., name="Bird"):
 		super().__init__()
@@ -595,7 +595,7 @@ class Bird(Function):
 
 class Bohachevsky(Function):
 	"""
-	Bohachevsky [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Bohachevsky]
+	Bohachevsky [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Bohachevsky]
 	"""
 	def __init__(self, c1=2., c2=0.3, c3=3., c4=0.4, c5=4., c6=0.7, d=2, name="Bohachevsky"):
 		super().__init__()
@@ -633,7 +633,7 @@ class Bohachevsky(Function):
 
 class Branin01(Function):
 	"""
-	Branin01 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Branin01]
+	Branin01 [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Branin01]
 	"""
 	def __init__(self, c1=1.275, c2=5., c3=6., c4=10., c5=5., c6=4., c7=10., name="Branin01"):
 		super().__init__()
@@ -674,7 +674,7 @@ class Branin01(Function):
 
 class Branin02(Function):
 	"""
-	Branin02 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Branin02]
+	Branin02 [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Branin02]
 	"""
 	def __init__(self, c1=1.275, c2=5., c3=6., c4=10., c5=5., c6=4., c7=1., c8=10., name="Branin02"):
 		super().__init__()
@@ -749,51 +749,85 @@ class Brent(Function):
 		x1, x2 = x[:, 0], x[:, 1]
 		return (2 * (x + self.c1) + np.exp(-x1 ** 2 - x2 ** 2)[:, np.newaxis] * -2 * x)[:, np.newaxis, :]
 
-class Brown(Function):
+class Bukin02(Function):
+    """
+    Bukin02 [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Bukin02]
+    """
+    def __init__(self, c1=100.0, c2=0.01, c3=1.0, c4=0.01, c5=10.0, name="Bukin02"):
+        super().__init__()
+        self.name = name
+        self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+        self.dim = 2
+        self.outdim = 1
+
+        self.setDimDom(domain=np.array([[-15., -5.], [-3., 3.]]))
+
+    def __call__(self, x):
+        r"""A 2-d multimodal function
+
+        ..math::
+            f(x)=c_1 (x_2 - c_2 x_1^2 + c_3) + c_4 (x_1 + c_5)^2
+
+
+        Default constant values are :math:`c = (100.0, 0.01, 1.0, 0.01, 10.0)
+
+        Args:
+            x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+        Returns:
+            np.ndarray: Output array of size `(N,1)`.
+        """
+        x1, x2 = x[:, 0], x[:, 1]
+        return (self.c1*(x[:, 1]-self.c2*x[:, 0]**2.0+self.c3)+self.c4*(x[:, 0]+self.c5)**2.0).reshape(-1, 1)
+
+    def grad(self, x):
+        grad = np.zeros((x.shape[0], self.outdim, self.dim))
+        grad[:, 0, 0] = -2.0*self.c2*self.c1*x[:, 0]+2.0*self.c4*(x[:, 0]+self.c5)
+        grad[:, 0, 1] = self.c1
+
+        return grad
+
+class Bukin04(Function):
 	"""
-	Brown [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Brown]
+	Bukin04 [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Bukin04]
 	"""
-	def __init__(self, c1=1., c2=1., d=4, name="Brown"):
+	def __init__(self, c1=100.0, c2=0.01, c3=10.0, name="Bukin04"):
 		super().__init__()
 		self.name = name
-		self.c1, self.c2, self.d = c1, c2, d
-		self.dim = d
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
 		self.outdim = 1
 
-		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-1., 1.]))
+		self.setDimDom(domain=np.array([[-15.0, -5.0], [-3.0, 3.0]]))
 
 	def __call__(self, x):
-		r"""A N-d multimodal function
+		r"""A 2-d multimodal function
 
-		.. math::
-			f(x)=\sum_{i=1}^{n-1}\left[ \left(x_i^2\right)^{x_{i+1}^2+c_1} + \left(x_{i+1}^2\right)^{x_i^2+c_2} \right]
+		..math::
+			f(x)=c_1 x_2^{2} + c_2 \abs{x_1 + c_3}
 
+
+		Default constant values are :math:`c = (100.0, 0.01, 10.0)
+		
 		Args:
-			x (np.ndarray): Input array :math:`x` of size `(N,d)`.
-
-
-		Default constant values are :math:`c = (-1., 4.)`.
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
 
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-		x_shr = np.concatenate((x[:, 1:], x[:, :1]), axis=1)
-		return np.sum(((x ** 2) ** (x_shr ** 2 + self.c1) + (x_shr ** 2) ** (x ** 2 + self.c2))[:, :-1], axis=1, keepdims=True)
+		return (self.c1*x[:, 1]**(2.0)+self.c2*np.abs(x[:, 0]+self.c3)).reshape(-1, 1)
 
 	def grad(self, x):
-		x1 = np.concatenate((x[:, :-1], np.zeros((x.shape[0], 1))), axis=1)
-		x2 = np.concatenate((np.zeros((x.shape[0], 1)), x[:, 1:]), axis=1)
-		grad = (x ** 2 + self.c1) * (x ** 2) ** (x ** 2 + self.c1 - 1) * 2 * x + (x ** 2 + self.c1) * (x2 ** 2) ** (x ** 2 +	 self.c1 - 1) * 2 * x
-		print(grad)
-		print(self.grad_(x))
-		return (grad)[:, np.newaxis, :]
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = self.c2*np.sign(x[:, 0]+self.c3)
+		grad[:, 0, 1] = 2.0*self.c1*x[:, 1]
 
-# https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
-# excluding discontinuous functions
+		return grad
+
 
 class Bukin6(Function):
 	"""
-	Bukin6 [https://infinity77.net/global_optimization/test_functions_nd_A.html#go_benchmark.Bukin6]
+	Bukin6 [https://infinity77.net/global_optimization/test_functions_nd_B.html#go_benchmark.Bukin6]
 	"""
 	def __init__(self, c1=100.0, c2=0.01, c3=0.01, c4=10.0, name="Bukin6"):
 		super().__init__()
@@ -836,6 +870,190 @@ class Bukin6(Function):
 
 		return grad
 
+class CarromTable(Function):
+	"""
+	CarromTable [https://infinity77.net/global_optimization/test_functions_nd_C.html#go_benchmark.CarromTable]
+	"""
+	def __init__(self, c1=1/30, c2=2.0, c3=1.0, name="CarromTable"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10.0, 10.0], [-10.0, 10.0]]))
+
+	def __call__(self, x):
+		r"""A 2-d multimodal function
+
+		..math::
+			f(x)=- c_1 \exp(c_2 \abs{c_3 - \frac{\sqrt{x_1^{2} + x_2^{2}}}{\pi}}) \cos(x_1)^2 \cos(x_2)^2
+
+
+		Default constant values are :math:`c = (1/30, 2.0, 1.0)
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (-self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*self.c2*np.sign(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi))*_frac(1.0)(2.0*np.pi*np.sqrt(x[:, 0]**2.0+x[:, 1]**2.0))*2.0*x[:, 0]*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*2.0*np.cos(x[:, 0])*np.sin(x[:, 0])*np.cos(x[:, 1])**2.0
+		grad[:, 0, 1] = self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi)))*self.c2*np.sign(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi))*_frac(1.0)(2.0*np.pi*np.sqrt(x[:, 1]**2.0+x[:, 0]**2.0))*2.0*x[:, 1]*np.cos(x[:, 1])**2.0*np.cos(x[:, 0])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi)))*2.0*np.cos(x[:, 1])*np.sin(x[:, 1])*np.cos(x[:, 0])**2.0
+
+		return grad
+
+class Chichinadze(Function):
+	"""
+	Chichinadze [https://infinity77.net/global_optimization/test_functions_nd_C.html#go_benchmark.Chichinadze]
+	"""
+	def __init__(self, c1=12.0, c2=8.0, c3=2.5, c4=10.0, c5=0.5, c6=11.0, c7=0.2 * np.sqrt(5), c8=0.5, c9=0.5, name="Chichinadze"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7, self.c8, self.c9 = c1, c2, c3, c4, c5, c6, c7, c8, c9
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-30.0, 30.0], [-30.0, 30.0]]))
+
+	def __call__(self, x):
+		r"""A 2-d multimodal function
+
+		..math::
+			f(x)= x_1^{2} - c_1 x_1 + c_2 \sin(c_3 \pi x_1) + c_4 \cos(c_5 \pi x_1) + c_6 - \frac{c_7}{\exp(c_8 (x_2 -c_9)^{2})}
+
+
+		Default constant values are :math:`c = (12.0, 8.0, 2.5, 10.0, 0.5, 11.0, 0.2 * \sqrt{5}, 0.5, 0.5)
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (x[:, 0]**(2.0)-self.c1*x[:, 0]+self.c2*np.sin(self.c3*np.pi*x[:, 0])+self.c4*np.cos(self.c5*np.pi*x[:, 0])+self.c6-_frac(self.c7)(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = 2.0*x[:, 0]-self.c1+self.c2*self.c3*np.pi*np.cos(self.c3*np.pi*x[:, 0])-self.c4*self.c5*np.pi*np.sin(self.c5*np.pi*x[:, 0])
+		grad[:, 0, 1] = _frac(self.c7)(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))**2.0)*np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))*self.c8*2.0*(x[:, 1]-self.c9)
+
+		return grad
+
+class Cigar(Function):
+	"""
+	Cigar [https://infinity77.net/global_optimization/test_functions_nd_C.html#go_benchmark.Cigar]
+	"""
+	def __init__(self, c1=10 ** 3, d=4, name="Cigar"):
+		super().__init__()
+		self.name = name
+		self.c1, self.d = c1, d
+		self.dim = d
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-100., 100.]))
+
+	def __call__(self, x):
+		r"""A N-d multimodal function
+
+		..math::
+			f(x)=x_1^2 + c_1 \sum_{i=2}^{n} x_i^2
+
+
+		Default constant values are :math:`c = (10 ** 3)
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,d)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (x[:, 0].reshape(-1, 1)**2+self.c1 * np.sum(x[:, 1:]**2, axis=1, keepdims=True))
+
+	def grad(self, x):
+		x_modified = np.concatenate((x[:, 0][:, np.newaxis], self.c1 * x[:, 1:]), axis=1)
+		grad = 2 * x_modified
+
+		return grad[:, np.newaxis, :]
+
+class Colville(Function):
+	"""
+	Colville [https://infinity77.net/global_optimization/test_functions_nd_C.html#go_benchmark.Colville]
+	"""
+	def __init__(self, c1=1.0, c2=100.0, c3=10.1, c4=1.0, c5=1.0, c6=90.0, c7=10.1, c8=1.0, c9=19.8, c10=1.0, name="Colville"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7, self.c8, self.c9, self.c10 = c1, c2, c3, c4, c5, c6, c7, c8, c9, c10
+		self.dim = 4
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10.0, 10.0], [-10.0, 10.0], [-10.0, 10.0], [-10.0, 10.0]]))
+
+	def __call__(self, x):
+		r"""A 4-d multimodal function
+
+		..math::
+			f(x)=(x_1 - c_1)^{2} + c_2 (x_1^{2} - x_2)^{2} + c_3 (x_2 - c_4)^{2} + (x_3 - c_5)^{2} + c_6 (x_3^{2} - x_4)^{2} + c_7 (x_4 - c_8)^{2} + c_9 \frac{x_4 - c_10}{x_2}
+
+
+		Default constant values are :math:`c = (1.0, 100.0, 10.1, 1.0, 1.0, 90.0, 10.1, 1.0, 19.8, 1.0)
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,4)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((x[:, 0]-self.c1)**(2.0)+self.c2*(x[:, 0]**(2.0)-x[:, 1])**(2.0)+self.c3*(x[:, 1]-self.c4)**(2.0)+(x[:, 2]-self.c5)**(2.0)+self.c6*(x[:, 2]**(2.0)-x[:, 3])**(2.0)+self.c7*(x[:, 3]-self.c8)**(2.0)+self.c9*_frac(x[:, 3]-self.c10)(x[:, 1])).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = 2.0*(x[:, 0]-self.c1)+self.c2*2.0*(x[:, 0]**2.0-x[:, 1])*2.0*x[:, 0]
+		grad[:, 0, 1] = -2.0*self.c2*(x[:, 0]**2.0-x[:, 1])+2.0*self.c3*(x[:, 1]-self.c4)-_frac(self.c9*(x[:, 3]-self.c10))(x[:, 1]**2.0)
+		grad[:, 0, 2] = 2.0*(x[:, 2]-self.c5)+2.0*self.c6*(x[:, 2]**2.0-x[:, 3])*2.0*x[:, 2]
+		grad[:, 0, 3] = -2.0*self.c6*(x[:, 2]**2.0-x[:, 3])+self.c7*2.0*(x[:, 3]-self.c8)+_frac(self.c9)(x[:, 1])
+
+		return grad
+
+class CosineMixture(Function):
+	"""
+	CosineMixture [https://infinity77.net/global_optimization/test_functions_nd_C.html#go_benchmark.CosineMixture]
+	"""
+	def __init__(self, c1=0.1, c2=5.0, d=2, name="CosineMixture"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = d
+		self.outdim = 1
+
+		self.setDimDom(domain=np.ones((self.dim, 1)) * np.array([-1., 1.]))
+
+	def __call__(self, x):
+		r"""A N-d multimodal function
+
+		..math::
+			f(x)=-c_1 \sum_{i=1}^n \cos(c_2 \pi x_i) - \sum_{i=1}^n x_i^2
+
+
+		Default constant values are :math:`c = (0.1, 5.0)
+		
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,d)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (-self.c1*np.sum(np.cos(self.c2*np.pi*x), axis=1)-np.sum(x**2.0, axis=1)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = self.c1*self.c2*np.pi*np.sin(self.c2*np.pi*x)-2*x
+
+		return grad[:, np.newaxis, :]
+
 class CrossInTray(Function):
 	"""
 	Cross-In-Tray [https://www.sfu.ca/~ssurjano/crossit.html] 
@@ -853,7 +1071,7 @@ class CrossInTray(Function):
 		r"""Cross-In-Tray function, has lots of local minima
 
 		.. math::
-			f(x)=-c_1(\abs{\sin(x_1)\sin(x_2)e^{\abs{c_2-\frac{\sqrt{x_1^2+x_2^2}}{\pi}}}}+c_3)^c_4
+			f(x)=-c_1(\abs{\sin(x_1)\sin(x_2)e^{\abs{c_2-\frac{\sqrt{x_1^2+x_2^2}}{\pi}}}}+c_3)^{c_4}
 
 
 		Default constant values are :math:`c = (0.0001, 100., 1., 0.1)`.
@@ -888,6 +1106,9 @@ class CrossInTray(Function):
 		grad[:, 0, 1] = -self.c1 * self.c4 * (np.abs(np.sin(x1) * np.sin(x2) * np.exp(np.abs(self.c2 - dist / np.pi))) + self.c3) ** (self.c4 - 1) * inner_absx2
 
 		return grad
+
+# https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
+# excluding discontinuous functions
 
 class DropWave(Function):
 	"""
