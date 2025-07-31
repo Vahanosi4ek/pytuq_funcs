@@ -1,14 +1,12 @@
 from lexer import *
 from parser import *
 from codegen import *
+from autograd import *
 
-latex = r"\frac{3xc_2}{2}"
-lexer = Lexer(latex)
-tokens = lexer.get_tokens()
+latex = r"(x^3)^2"
 
-parser = Parser(tokens)
-ast = parser.parse()
+code = codegen(latex)
+# grad = autograd_1d(latex)
 
-code = codegen(ast)
-
-print(code)
+print(f"code: {code}")
+# print(f"grad: {grad}")

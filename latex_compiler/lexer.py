@@ -23,7 +23,7 @@ class Token:
 		self.val = val
 
 	def __repr__(self):
-		return f"[ {self.type}, {self.val} ]" if self.val else f"[ {self.type} ]"
+		return f"[ {self.type}, {self.val} ]" if (self.val is not None) else f"[ {self.type} ]"
 
 	__str__ = __repr__
 

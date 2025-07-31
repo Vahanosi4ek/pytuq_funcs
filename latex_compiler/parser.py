@@ -49,15 +49,19 @@ class Parser:
 				self.advance()
 				den = self.add_sub()
 				self.advance()
-				return FracNode(num, den)
+				return BinOp(num, Token(Tokens.Div), den)
 			else:
 				self.advance() # go to the left paren or sub/super script
+				suf = None
 				if self.cur.type in (Tokens.SubScript, Tokens.SuperScript):
-					tok = SubSuperScriptNode(FuncNode(tok), self.suffix())
+					suf = self.suffix()
 				self.advance() # go to start of arg
 				arg = self.add_sub()
 				self.advance() # go past the right paren
-				return UnaryOp(tok, arg)
+				if suf:
+					return UnaryOp(tok, arg, suf)
+				else:
+					return UnaryOp(tok, arg)
 
 		raise Exception(f"Unable to parse the tokens {self.tokens} at position {self.cur_i}")
 
@@ -113,9 +117,8 @@ class Parser:
 		suffix = self.suffix()
 
 		if suffix:
-			return SubSuperScriptNode(left, suffix)
-		else:
-			return left
+			left.suffix = suffix
+		return left
 
 	def simple(self):
 		if self.cur.type in (Tokens.Add, Tokens.Sub):

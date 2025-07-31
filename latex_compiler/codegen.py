@@ -1,5 +1,7 @@
 from nodes import *
 from lexer import *
+from parser import *
+from autograd import *
 
 func_dict = {
 	"sin": "np.sin",
@@ -12,64 +14,73 @@ func_dict = {
 	"prod": "np.prod",
 }
 
-def codegen(ast):
+const_dict = {
+	"pi": "np.pi"
+}
+
+def ast_to_code(ast):
 	code = ""
 
 	if isinstance(ast, NumNode):
 		code += f"{ast.tok.val}"
+		if ast.suffix:
+			if ast.suffix.sub:
+				raise Exception(f"Can't subscript {ast.tok.val}")
+			power = ast.suffix.super_
+			code += f"**({ast_to_code(power)})"
 
 	elif isinstance(ast, VarNode):
-		if ast.tok.val != "x":
-			print(f"Warning: the variable {ast.tok.val} may be invalid.")
+		sub = ast.suffix.sub
+		power = ast.suffix.super_
 
-		code += f"{ast.tok.val}"
+		var = ast.tok.val
+		if ast.tok.type == Tokens.Const:
+			code += const_dict[ast.tok.val]
+
+		elif var == "x":
+			if not sub:
+				code += var
+			else:
+				code += var + f"[:, {int(sub.tok.val) - 1}]"
+
+		elif var == "c":
+			if not sub:
+				print(f"Warning: the variable {var} may be invalid.")
+			else:
+				code += "self." + var + str(sub.tok.val)
+
+		if power:
+			code += f"**({ast_to_code(power)})"
 
 	elif isinstance(ast, UnaryOp):
 		if ast.op_tok.type in (Tokens.Add, Tokens.Sub):
-			code = ast.op_tok.type + f"({codegen(ast.node)})"
+			code += ast.op_tok.type + f"({ast_to_code(ast.node)})"
 
 		elif ast.op_tok.type == Tokens.Func:
-			code = func_dict[ast.op_tok.val] + f"({codegen(ast.node)})"
+			if ast.suffix:
+				code += func_dict[ast.op_tok.val] + f"({ast_to_code(ast.node)})**({ast_to_code(ast.suffix.super_)})"
+			else:
+				code += func_dict[ast.op_tok.val] + f"({ast_to_code(ast.node)})"
 
 	elif isinstance(ast, BinOp):
-		left_code = codegen(ast.left_node)
-		right_code = codegen(ast.right_node)
-		if not isinstance(ast.left_node, (NumNode, VarNode, SubSuperScriptNode)):
-			left_code = f"({left_code})"
-		if not isinstance(ast.right_node, (NumNode, VarNode, SubSuperScriptNode)):
-			right_code = f"({right_code})"
-		code += f"{left_code}{ast.op_tok.type}{right_code}"
-
-	elif isinstance(ast, FracNode):
-		code += f"({codegen(ast.num)})/({codegen(ast.den)})"
-
-	elif isinstance(ast, SubSuperScriptNode):
-		if isinstance(ast.node, NumNode):
-			if ast.suffix_node.sub:
-				raise Exception(f"Can't subscript {ast.node.tok.val}")
-			power = ast.suffix_node.super_
-			code += str(ast.node.tok.val) + f"**({codegen(power)})"
-
-		elif isinstance(ast.node, VarNode):
-			sub = ast.suffix_node.sub
-			power = ast.suffix_node.super_
-
-			var = ast.node.tok.val
-			if var == "x":
-				if not sub:
-					code += var
-				else:
-					code += var + f"[:, {int(sub.tok.val) - 1}]"
-
-			if var == "c":
-				if not sub:
-					print(f"Warning: the variable {var} may be invalid.")
-				else:
-					code += "self." + var + str(sub.tok.val)
-
-			if not sub and power:
-				code += var + f"**({codegen(power)})"
-			if sub and power:
-				code += f"**({codegen(power)})"
+		if ast.op_tok.type in (Tokens.Add, Tokens.Sub):
+			base = f"{ast_to_code(ast.left_node)}{ast.op_tok.type}{ast_to_code(ast.right_node)}"
+		else:
+			base = f"({ast_to_code(ast.left_node)}){ast.op_tok.type}({ast_to_code(ast.right_node)})"
+		if ast.suffix:
+			code += f"({base})**{(ast_to_code(ast.suffix.super_))}"
+		else:
+			code += f"({base})"
 
 	return code
+
+def codegen(latex):
+	lexer = Lexer(latex)
+	tokens = lexer.get_tokens()
+
+	parser = Parser(tokens)
+	ast = parser.parse()
+
+	code = ast_to_code(ast)
+	print(ast)
+	return configure_exponent_ast(ast)
