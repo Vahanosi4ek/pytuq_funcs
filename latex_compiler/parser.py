@@ -32,7 +32,10 @@ class Parser:
 
 		if tok.type in (Tokens.Var, Tokens.Const):
 			self.advance()
-			return VarNode(tok)
+			if tok.val == "e" and self.tokens[self.cur_i].type != Tokens.SuperScript:
+				return UnaryOp(Token(Tokens.Func, "exp"), NumNode(Token(Tokens.Num, 1)))
+			else:
+				return VarNode(tok)
 
 		if tok.type == Tokens.Lparen:
 			self.advance()
@@ -59,7 +62,7 @@ class Parser:
 				arg = self.add_sub()
 				self.advance() # go past the right paren
 				if suf:
-					return UnaryOp(tok, arg, suf)
+					return SubSuperScriptNode(UnaryOp(tok, arg), suf)
 				else:
 					return UnaryOp(tok, arg)
 
@@ -91,7 +94,10 @@ class Parser:
 		elif self.cur.type == Tokens.SuperScript:
 			# char
 			if self.cur.val:
-				super_ = NumNode(Token(Tokens.Num, self.cur.val))
+				if self.cur.val.isdigit():
+					super_ = NumNode(Token(Tokens.Num, self.cur.val))
+				else:
+					super_ = VarNode(Token(Tokens.Var, self.cur.val))
 			else:
 				self.advance() # go to the left brace
 				self.advance() # go to the first char
@@ -117,7 +123,10 @@ class Parser:
 		suffix = self.suffix()
 
 		if suffix:
-			left.suffix = suffix
+			if isinstance(left, VarNode) and left.tok.val == "e":
+				left = UnaryOp(Token(Tokens.Func, "exp"), suffix.super_)
+			else:
+				left = SubSuperScriptNode(left, suffix)
 		return left
 
 	def simple(self):

@@ -6,12 +6,14 @@ import numpy as np
 from pytuq.utils.plotting import myrc
 
 from benchmark import *
+from autogen import *
 
 myrc()
 
 fcns = [
 # From https://infinity77.net/global_optimization/test_functions.html
 # 1D
+    TestClass(),
     # SineSum(),
     # SineSum2(),
     # QuadxExp(),
@@ -38,7 +40,7 @@ fcns = [
     # Bukin04(),
     # Bukin6(),
     # CarromTable(),
-    # Chichinadze(),
+    Chichinadze(),
     # Cigar(),
     # Colville(),
     # CosineMixture(),

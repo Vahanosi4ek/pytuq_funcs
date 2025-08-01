@@ -1,5 +1,5 @@
 def create_class(name, consts, dim, outdim, domain_list,
-					description, latex, grad_latex_list):
+					description, latex, grad_code_list):
 	consts1 = ""
 	for i, c in enumerate(consts):
 		consts1 += f"c{i + 1}={c}, "
@@ -14,14 +14,8 @@ def create_class(name, consts, dim, outdim, domain_list,
 	for i, c in enumerate(consts):
 		consts3 += str(c) + (", " if i != len(consts) - 1 else ")")
 
-	grad_code = []
-	for latex_grad in grad_latex_list:
-		grad_translator = Translator(latex_grad)
-		tokens = grad_translator.get_tokens()
-		grad_code.append(grad_translator.token_to_code(tokens))
-
 	grad_str = ""
-	for i, grad in enumerate(grad_code):
+	for i, grad in enumerate(grad_code_list):
 		grad_str += f"\t\tgrad[:, 0, {i}] = {grad}\n"
 
 	code = fr'''import numpy as np
@@ -55,7 +49,7 @@ class {name}(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,{outdim})`.
 		"""
-		return ({latex_code}).reshape(-1, 1)
+		return ({latex}).reshape(-1, 1)
 
 	def grad(self, x):
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))

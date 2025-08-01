@@ -3,18 +3,13 @@
 import numpy as np
 from pytuq.func.func import Function
 
-# Useful specifically for function_creater.py to avoid parsing \frac{...}{...},
-# and instead we can just say _frac(...)(...)
-# I'm sorry for this code, but it makes my job a lot easier
-def _frac(a):
-	def _frac2(b):
-		return a / b
-	return _frac2
-
 # TODO: add complete support for discontinuous and nondifferentiable functions
 
 # https://infinity77.net/global_optimization/test_functions.html#test-functions-index
 # 1-d functions
+
+def _frac(a):
+	return lambda b: a / b
 
 class SineSum(Function):
 	"""

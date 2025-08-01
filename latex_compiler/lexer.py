@@ -29,11 +29,7 @@ class Token:
 
 class Lexer:
 	def __init__(self, func_str):
-		self.func_str = ""
-
-		for c in func_str:
-			if c not in " \t\n":
-				self.func_str += c
+		self.func_str = func_str
 
 		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "frac"}
 		self.consts = {"pi"}
@@ -81,20 +77,26 @@ class Lexer:
 				continue
 
 			if c == "_":
-				if s[i + 1] == Tokens.Lbrace:
-					tokens.append(Token(Tokens.SubScript))
+				i += 1
+				while s[i] in " \t\n":
 					i += 1
+
+				if s[i] == Tokens.Lbrace:
+					tokens.append(Token(Tokens.SubScript))
 				else:
-					tokens.append(Token(Tokens.SubScript, s[i + 1]))
-					i += 2
+					tokens.append(Token(Tokens.SubScript, s[i]))
+					i += 1
 				continue
 			if c == "^":
-				if s[i + 1] == Tokens.Lbrace:
-					tokens.append(Token(Tokens.SuperScript))
+				i += 1
+				while s[i] in " \t\n":
 					i += 1
+
+				if s[i] == Tokens.Lbrace:
+					tokens.append(Token(Tokens.SuperScript))
 				else:
-					tokens.append(Token(Tokens.SuperScript, s[i + 1]))
-					i += 2
+					tokens.append(Token(Tokens.SuperScript, s[i]))
+					i += 1
 				continue
 
 			if c.isdigit() or (c == "." and i+1 < len(s) and s[i+1].isdigit()):
