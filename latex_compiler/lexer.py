@@ -32,7 +32,7 @@ class Lexer:
 	def __init__(self, func_str):
 		self.func_str = func_str
 
-		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "frac", "sqrt"}
+		self.funcs = {"cos", "sin", "tan", "log", "exp", "sum", "prod", "sign", "abs", "frac", "sqrt"}
 		self.consts = {"pi"}
 
 	def get_tokens(self):

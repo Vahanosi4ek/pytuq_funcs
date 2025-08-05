@@ -62,6 +62,18 @@ class Parser:
 				den = self.add_sub()
 				self.advance()
 				return BinOp(num, Token(Tokens.Div), den)
+			elif tok.val == "tan":
+				self.advance() # go to the left paren or sub/super script
+				suf = None
+				if self.cur.type in (Tokens.SubScript, Tokens.SuperScript):
+					suf = self.suffix()
+				self.advance() # go to start of arg
+				arg = self.add_sub()
+				self.advance() # go past the right paren
+				if suf:
+					return SubSuperScriptNode(BinOp(UnaryOp(Token(Tokens.Func, "sin"), arg), Token(Tokens.Div), UnaryOp(Token(Tokens.Func, "cos"), arg)), suf)
+				else:
+					return BinOp(UnaryOp(Token(Tokens.Func, "sin"), arg), Token(Tokens.Div), UnaryOp(Token(Tokens.Func, "cos"), arg))
 			else:
 				self.advance() # go to the left paren or sub/super script
 				suf = None

@@ -1173,6 +1173,1770 @@ class DeckkersAarts(Function):
 
 		return grad
 
+class Dolan(Function):
+	"""
+	Dolan [https://infinity77.net/global_optimization/test_functions_nd_D.html#go_benchmark.Dolan]
+	"""
+	def __init__(self, c1=1.7, c2=1.5, c3=0.1, c4=0.2, c5=1, name="Dolan"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+		self.dim = 5
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-100, 100], [-100, 100], [-100, 100], [-100, 100], [-100, 100]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\abs{(x_1 + c_1x_2)\sin(x_1) - c_2x_3 - c_3x_4\cos(x_5 + x_5 - x_1) + c_4x_5^2 - x_2 - c_5}
+
+
+		Default constant values are :math:`c = (1.7, 1.5, 0.1, 0.2, 1)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,5)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (np.abs(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = np.sign(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)*((np.sin(x[:, 0])+((x[:, 0]+(self.c1*x[:, 1]))*np.cos(x[:, 0])))-((self.c3*x[:, 3])*(-(-np.sin((x[:, 4]+x[:, 4])-x[:, 0])))))
+		grad[:, 0, 1] = np.sign(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)*((self.c1*np.sin(x[:, 0]))-1)
+		grad[:, 0, 2] = np.sign(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)*(-self.c2)
+		grad[:, 0, 3] = np.sign(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)*(-(self.c3*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))
+		grad[:, 0, 4] = np.sign(((((((x[:, 0]+(self.c1*x[:, 1]))*np.sin(x[:, 0]))-(self.c2*x[:, 2]))-((self.c3*x[:, 3])*np.cos((x[:, 4]+x[:, 4])-x[:, 0])))+(self.c4*x[:, 4]**2))-x[:, 1])-self.c5)*((-((self.c3*x[:, 3])*((-np.sin((x[:, 4]+x[:, 4])-x[:, 0]))*(1+1))))+(self.c4*(x[:, 4]**2*(2*(1/x[:, 4])))))
+
+		return grad
+
+class EggCrate(Function):
+	"""
+	EggCrate [https://infinity77.net/global_optimization/test_functions_nd_E.html#go_benchmark.EggCrate]
+	"""
+	def __init__(self, c1=25.0, name="EggCrate"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=x_1^2 + x_2^2 + c_1 \left[ \sin^2(x_1) + \sin^2(x_2) \right]
+
+
+		Default constant values are :math:`c = (25.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((x[:, 0]**2+x[:, 1]**2)+(self.c1*(np.sin(x[:, 0])**2+np.sin(x[:, 1])**2))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (x[:, 0]**2*(2*(1/x[:, 0])))+(self.c1*(np.sin(x[:, 0])**2*(2*((1/np.sin(x[:, 0]))*np.cos(x[:, 0])))))
+		grad[:, 0, 1] = (x[:, 1]**2*(2*(1/x[:, 1])))+(self.c1*(np.sin(x[:, 1])**2*(2*((1/np.sin(x[:, 1]))*np.cos(x[:, 1])))))
+
+		return grad
+
+class ElAttarVidyasagarDutta(Function):
+	"""
+	ElAttarVidyasagarDutta [https://infinity77.net/global_optimization/test_functions_nd_E.html#go_benchmark.ElAttarVidyasagarDutta]
+	"""
+	def __init__(self, c1=10.0, c2=7.0, c3=1.0, name="ElAttarVidyasagarDutta"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-100, 100], [-100, 100]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(x_1^2 + x_2 - c_1)^2 + (x_1 + x_2^2 - c_2)^2 + (x_1^2 + x_2^3 - c_3)^2
+
+
+		Default constant values are :math:`c = (10.0, 7.0, 1.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((x[:, 0]**2+x[:, 1])-self.c1)**2+((x[:, 0]+x[:, 1]**2)-self.c2)**2)+((x[:, 0]**2+x[:, 1]**3)-self.c3)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((((x[:, 0]**2+x[:, 1])-self.c1)**2*(2*((1/((x[:, 0]**2+x[:, 1])-self.c1))*(x[:, 0]**2*(2*(1/x[:, 0]))))))+(((x[:, 0]+x[:, 1]**2)-self.c2)**2*(2*(1/((x[:, 0]+x[:, 1]**2)-self.c2)))))+(((x[:, 0]**2+x[:, 1]**3)-self.c3)**2*(2*((1/((x[:, 0]**2+x[:, 1]**3)-self.c3))*(x[:, 0]**2*(2*(1/x[:, 0]))))))
+		grad[:, 0, 1] = ((((x[:, 0]**2+x[:, 1])-self.c1)**2*(2*(1/((x[:, 0]**2+x[:, 1])-self.c1))))+(((x[:, 0]+x[:, 1]**2)-self.c2)**2*(2*((1/((x[:, 0]+x[:, 1]**2)-self.c2))*(x[:, 1]**2*(2*(1/x[:, 1])))))))+(((x[:, 0]**2+x[:, 1]**3)-self.c3)**2*(2*((1/((x[:, 0]**2+x[:, 1]**3)-self.c3))*(x[:, 1]**3*(3*(1/x[:, 1]))))))
+
+		return grad
+
+class FreudensteinRoth(Function):
+	"""
+	FreudensteinRoth [https://infinity77.net/global_optimization/test_functions_nd_F.html#go_benchmark.FreudensteinRoth]
+	"""
+	def __init__(self, c1=13.0, c2=5.0, c3=2.0, c4=29.0, c5=1.0, c6=14.0, name="FreudensteinRoth"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6 = c1, c2, c3, c4, c5, c6
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left(x_1 - c_1 + \left[(c_2 - x_2)x_2 - c_3 \right] x_2 \right)^2 + \left (x_1 - c_4 + \left[(x_2 + c_5)x_2 - c_6 \right] x_2 \right)^2
+
+
+		Default constant values are :math:`c = (13.0, 5.0, 2.0, 29.0, 1.0, 14.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((x[:, 0]-self.c1)+((((self.c2-x[:, 1])*x[:, 1])-self.c3)*x[:, 1]))**2+((x[:, 0]-self.c4)+((((x[:, 1]+self.c5)*x[:, 1])-self.c6)*x[:, 1]))**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((x[:, 0]-self.c1)+((((self.c2-x[:, 1])*x[:, 1])-self.c3)*x[:, 1]))**2*(2*(1/((x[:, 0]-self.c1)+((((self.c2-x[:, 1])*x[:, 1])-self.c3)*x[:, 1])))))+(((x[:, 0]-self.c4)+((((x[:, 1]+self.c5)*x[:, 1])-self.c6)*x[:, 1]))**2*(2*(1/((x[:, 0]-self.c4)+((((x[:, 1]+self.c5)*x[:, 1])-self.c6)*x[:, 1])))))
+		grad[:, 0, 1] = (((x[:, 0]-self.c1)+((((self.c2-x[:, 1])*x[:, 1])-self.c3)*x[:, 1]))**2*(2*((1/((x[:, 0]-self.c1)+((((self.c2-x[:, 1])*x[:, 1])-self.c3)*x[:, 1])))*((((-x[:, 1])+(self.c2-x[:, 1]))*x[:, 1])+(((self.c2-x[:, 1])*x[:, 1])-self.c3)))))+(((x[:, 0]-self.c4)+((((x[:, 1]+self.c5)*x[:, 1])-self.c6)*x[:, 1]))**2*(2*((1/((x[:, 0]-self.c4)+((((x[:, 1]+self.c5)*x[:, 1])-self.c6)*x[:, 1])))*(((x[:, 1]+(x[:, 1]+self.c5))*x[:, 1])+(((x[:, 1]+self.c5)*x[:, 1])-self.c6)))))
+
+		return grad
+
+class GoldsteinPrice(Function):
+	"""
+	GoldsteinPrice [https://infinity77.net/global_optimization/test_functions_nd_G.html#go_benchmark.GoldsteinPrice]
+	"""
+	def __init__(self, name="GoldsteinPrice"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-2, 2], [-2, 2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left[ 1+(x_1+x_2+1)^2(19-14x_1+3x_1^2-14x_2+6x_1x_2+3x_2^2) \right] \left[ 30+(2x_1-3x_2)^2(18-32x_1+12x_1^2+48x_2-36x_1x_2+27x_2^2) \right]
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((1+(((x[:, 0]+x[:, 1])+1)**2*(((((19-(14*x[:, 0]))+(3*x[:, 0]**2))-(14*x[:, 1]))+((6*x[:, 0])*x[:, 1]))+(3*x[:, 1]**2))))*(30+(((2*x[:, 0])-(3*x[:, 1]))**2*(((((18-(32*x[:, 0]))+(12*x[:, 0]**2))+(48*x[:, 1]))-((36*x[:, 0])*x[:, 1]))+(27*x[:, 1]**2))))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((((((x[:, 0]+x[:, 1])+1)**2*(2*(1/((x[:, 0]+x[:, 1])+1))))*(((((19-(14*x[:, 0]))+(3*x[:, 0]**2))-(14*x[:, 1]))+((6*x[:, 0])*x[:, 1]))+(3*x[:, 1]**2)))+(((x[:, 0]+x[:, 1])+1)**2*(((-14)+(3*(x[:, 0]**2*(2*(1/x[:, 0])))))+(6*x[:, 1]))))*(30+(((2*x[:, 0])-(3*x[:, 1]))**2*(((((18-(32*x[:, 0]))+(12*x[:, 0]**2))+(48*x[:, 1]))-((36*x[:, 0])*x[:, 1]))+(27*x[:, 1]**2)))))+((1+(((x[:, 0]+x[:, 1])+1)**2*(((((19-(14*x[:, 0]))+(3*x[:, 0]**2))-(14*x[:, 1]))+((6*x[:, 0])*x[:, 1]))+(3*x[:, 1]**2))))*(((((2*x[:, 0])-(3*x[:, 1]))**2*(2*((1/((2*x[:, 0])-(3*x[:, 1])))*2)))*(((((18-(32*x[:, 0]))+(12*x[:, 0]**2))+(48*x[:, 1]))-((36*x[:, 0])*x[:, 1]))+(27*x[:, 1]**2)))+(((2*x[:, 0])-(3*x[:, 1]))**2*(((-32)+(12*(x[:, 0]**2*(2*(1/x[:, 0])))))-(36*x[:, 1])))))
+		grad[:, 0, 1] = ((((((x[:, 0]+x[:, 1])+1)**2*(2*(1/((x[:, 0]+x[:, 1])+1))))*(((((19-(14*x[:, 0]))+(3*x[:, 0]**2))-(14*x[:, 1]))+((6*x[:, 0])*x[:, 1]))+(3*x[:, 1]**2)))+(((x[:, 0]+x[:, 1])+1)**2*(((-14)+(6*x[:, 0]))+(3*(x[:, 1]**2*(2*(1/x[:, 1])))))))*(30+(((2*x[:, 0])-(3*x[:, 1]))**2*(((((18-(32*x[:, 0]))+(12*x[:, 0]**2))+(48*x[:, 1]))-((36*x[:, 0])*x[:, 1]))+(27*x[:, 1]**2)))))+((1+(((x[:, 0]+x[:, 1])+1)**2*(((((19-(14*x[:, 0]))+(3*x[:, 0]**2))-(14*x[:, 1]))+((6*x[:, 0])*x[:, 1]))+(3*x[:, 1]**2))))*(((((2*x[:, 0])-(3*x[:, 1]))**2*(2*((1/((2*x[:, 0])-(3*x[:, 1])))*(-3))))*(((((18-(32*x[:, 0]))+(12*x[:, 0]**2))+(48*x[:, 1]))-((36*x[:, 0])*x[:, 1]))+(27*x[:, 1]**2)))+(((2*x[:, 0])-(3*x[:, 1]))**2*((48-(36*x[:, 0]))+(27*(x[:, 1]**2*(2*(1/x[:, 1]))))))))
+
+		return grad
+
+class HimmelBlau(Function):
+	"""
+	HimmelBlau [https://infinity77.net/global_optimization/test_functions_nd_H.html#go_benchmark.HimmelBlau]
+	"""
+	def __init__(self, c1=11.0, c2=7.0, name="HimmelBlau"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-6, 6], [-6, 6]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(x_1^2 + x_2 - c_1)^2 + (x_1 + x_2^2 - c_2)^2
+
+
+		Default constant values are :math:`c = (11.0, 7.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((x[:, 0]**2+x[:, 1])-self.c1)**2+((x[:, 0]+x[:, 1]**2)-self.c2)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((x[:, 0]**2+x[:, 1])-self.c1)**2*(2*((1/((x[:, 0]**2+x[:, 1])-self.c1))*(x[:, 0]**2*(2*(1/x[:, 0]))))))+(((x[:, 0]+x[:, 1]**2)-self.c2)**2*(2*(1/((x[:, 0]+x[:, 1]**2)-self.c2))))
+		grad[:, 0, 1] = (((x[:, 0]**2+x[:, 1])-self.c1)**2*(2*(1/((x[:, 0]**2+x[:, 1])-self.c1))))+(((x[:, 0]+x[:, 1]**2)-self.c2)**2*(2*((1/((x[:, 0]+x[:, 1]**2)-self.c2))*(x[:, 1]**2*(2*(1/x[:, 1]))))))
+
+		return grad
+
+class Hosaki(Function):
+	"""
+	Hosaki [https://infinity77.net/global_optimization/test_functions_nd_H.html#go_benchmark.Hosaki]
+	"""
+	def __init__(self, c1=1.0, c2=8.0, c3=7.0, c4=2.3333333333333335, c5=0.25, name="Hosaki"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0, 10], [0, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left ( c_1 - c_2x_1 + c_3x_1^2 - c_4x_1^3 + c_5x_1^4 \right )x_2^2e^{-x_1}
+
+
+		Default constant values are :math:`c = (1.0, 8.0, 7.0, 2.3333333333333335, 0.25)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((((self.c1-(self.c2*x[:, 0]))+(self.c3*x[:, 0]**2))-(self.c4*x[:, 0]**3))+(self.c5*x[:, 0]**4))*x[:, 1]**2)*np.exp(-x[:, 0])).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((((((-self.c2)+(self.c3*(x[:, 0]**2*(2*(1/x[:, 0])))))-(self.c4*(x[:, 0]**3*(3*(1/x[:, 0])))))+(self.c5*(x[:, 0]**4*(4*(1/x[:, 0])))))*x[:, 1]**2)*np.exp(-x[:, 0]))+((((((self.c1-(self.c2*x[:, 0]))+(self.c3*x[:, 0]**2))-(self.c4*x[:, 0]**3))+(self.c5*x[:, 0]**4))*x[:, 1]**2)*(-np.exp(-x[:, 0])))
+		grad[:, 0, 1] = (((((self.c1-(self.c2*x[:, 0]))+(self.c3*x[:, 0]**2))-(self.c4*x[:, 0]**3))+(self.c5*x[:, 0]**4))*(x[:, 1]**2*(2*(1/x[:, 1]))))*np.exp(-x[:, 0])
+
+		return grad
+
+class Keane(Function):
+	"""
+	Keane [https://infinity77.net/global_optimization/test_functions_nd_K.html#go_benchmark.Keane]
+	"""
+	def __init__(self, name="Keane"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0, 10], [0, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\frac{\sin^2(x_1 - x_2)\sin^2(x_1 + x_2)}{\sqrt{x_1^2 + x_2^2}}
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((np.sin(x[:, 0]-x[:, 1])**2*np.sin(x[:, 0]+x[:, 1])**2)/np.sqrt(x[:, 0]**2+x[:, 1]**2)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((((np.sin(x[:, 0]-x[:, 1])**2*(2*((1/np.sin(x[:, 0]-x[:, 1]))*np.cos(x[:, 0]-x[:, 1]))))*np.sin(x[:, 0]+x[:, 1])**2)+(np.sin(x[:, 0]-x[:, 1])**2*(np.sin(x[:, 0]+x[:, 1])**2*(2*((1/np.sin(x[:, 0]+x[:, 1]))*np.cos(x[:, 0]+x[:, 1]))))))*np.sqrt(x[:, 0]**2+x[:, 1]**2))-((np.sin(x[:, 0]-x[:, 1])**2*np.sin(x[:, 0]+x[:, 1])**2)*((1/(2*np.sqrt(x[:, 0])))*(x[:, 0]**2*(2*(1/x[:, 0]))))))/np.sqrt(x[:, 0]**2+x[:, 1]**2)**2
+		grad[:, 0, 1] = (((((np.sin(x[:, 0]-x[:, 1])**2*(2*((1/np.sin(x[:, 0]-x[:, 1]))*(-np.cos(x[:, 0]-x[:, 1])))))*np.sin(x[:, 0]+x[:, 1])**2)+(np.sin(x[:, 0]-x[:, 1])**2*(np.sin(x[:, 0]+x[:, 1])**2*(2*((1/np.sin(x[:, 0]+x[:, 1]))*np.cos(x[:, 0]+x[:, 1]))))))*np.sqrt(x[:, 0]**2+x[:, 1]**2))-((np.sin(x[:, 0]-x[:, 1])**2*np.sin(x[:, 0]+x[:, 1])**2)*((1/(2*np.sqrt(x[:, 1])))*(x[:, 1]**2*(2*(1/x[:, 1]))))))/np.sqrt(x[:, 0]**2+x[:, 1]**2)**2
+
+		return grad
+
+class Leon(Function):
+	"""
+	Leon [https://infinity77.net/global_optimization/test_functions_nd_L.html#go_benchmark.Leon]
+	"""
+	def __init__(self, c1=100, name="Leon"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-1.2, 1.2], [-1.2, 1.2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)= \left(1 - x_{1}\right)^{2} + c_1 \left(x_{2} - x_{1}^{2} \right)^{2}
+
+
+		Default constant values are :math:`c = (100)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((1-x[:, 0])**2+(self.c1*(x[:, 1]-x[:, 0]**2)**2)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((1-x[:, 0])**2*(2*(-(1/(1-x[:, 0])))))+(self.c1*((x[:, 1]-x[:, 0]**2)**2*(2*((1/(x[:, 1]-x[:, 0]**2))*(-(x[:, 0]**2*(2*(1/x[:, 0]))))))))
+		grad[:, 0, 1] = self.c1*((x[:, 1]-x[:, 0]**2)**2*(2*(1/(x[:, 1]-x[:, 0]**2))))
+
+		return grad
+
+class Levy13(Function):
+	"""
+	Levy13 [https://infinity77.net/global_optimization/test_functions_nd_L.html#go_benchmark.Levy13]
+	"""
+	def __init__(self, c1=1.0, c2=3.0, c3=1.0, c4=1.0, c5=2.0, c6=1.0, c7=3.0, name="Levy13"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7 = c1, c2, c3, c4, c5, c6, c7
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left(x_{1} -c_1\right)^{2} \left[\sin^{2}\left(c_2 \pi x_{2}\right) + c_3\right] + \left(x_{2} -c_4\right)^{2} \left[\sin^{2}\left(c_5 \pi x_{2}\right) + c_6\right] + \sin^{2}\left(c_7 \pi x_{1}\right)
+
+
+		Default constant values are :math:`c = (1.0, 3.0, 1.0, 1.0, 2.0, 1.0, 3.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((x[:, 0]-self.c1)**2*(np.sin((self.c2*np.pi)*x[:, 1])**2+self.c3))+((x[:, 1]-self.c4)**2*(np.sin((self.c5*np.pi)*x[:, 1])**2+self.c6)))+np.sin((self.c7*np.pi)*x[:, 0])**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((x[:, 0]-self.c1)**2*(2*(1/(x[:, 0]-self.c1))))*(np.sin((self.c2*np.pi)*x[:, 1])**2+self.c3))+(np.sin((self.c7*np.pi)*x[:, 0])**2*(2*((1/np.sin((self.c7*np.pi)*x[:, 0]))*(np.cos((self.c7*np.pi)*x[:, 0])*(self.c7*np.pi)))))
+		grad[:, 0, 1] = ((x[:, 0]-self.c1)**2*(np.sin((self.c2*np.pi)*x[:, 1])**2*(2*((1/np.sin((self.c2*np.pi)*x[:, 1]))*(np.cos((self.c2*np.pi)*x[:, 1])*(self.c2*np.pi))))))+((((x[:, 1]-self.c4)**2*(2*(1/(x[:, 1]-self.c4))))*(np.sin((self.c5*np.pi)*x[:, 1])**2+self.c6))+((x[:, 1]-self.c4)**2*(np.sin((self.c5*np.pi)*x[:, 1])**2*(2*((1/np.sin((self.c5*np.pi)*x[:, 1]))*(np.cos((self.c5*np.pi)*x[:, 1])*(self.c5*np.pi)))))))
+
+		return grad
+
+class Matyas(Function):
+	"""
+	Matyas [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Matyas]
+	"""
+	def __init__(self, c1=0.26, c2=0.48, name="Matyas"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1(x_1^2 + x_2^2) - c_2x_1x_2
+
+
+		Default constant values are :math:`c = (0.26, 0.48)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((self.c1*(x[:, 0]**2+x[:, 1]**2))-((self.c2*x[:, 0])*x[:, 1])).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (self.c1*(x[:, 0]**2*(2*(1/x[:, 0]))))-(self.c2*x[:, 1])
+		grad[:, 0, 1] = (self.c1*(x[:, 1]**2*(2*(1/x[:, 1]))))-(self.c2*x[:, 0])
+
+		return grad
+
+class McCormick(Function):
+	"""
+	McCormick [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.McCormick]
+	"""
+	def __init__(self, c1=2.0, c2=1.0, name="McCormick"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-1.5, 4], [-1.5, 4]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=- x_{1} + c_1 x_{2} + \left(x_{1} - x_{2}\right)^{2} + \sin\left(x_{1} + x_{2}\right) + c_2
+
+
+		Default constant values are :math:`c = (2.0, 1.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((((-x[:, 0])+(self.c1*x[:, 1]))+(x[:, 0]-x[:, 1])**2)+np.sin(x[:, 0]+x[:, 1]))+self.c2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((-1)+((x[:, 0]-x[:, 1])**2*(2*(1/(x[:, 0]-x[:, 1])))))+np.cos(x[:, 0]+x[:, 1])
+		grad[:, 0, 1] = (self.c1+((x[:, 0]-x[:, 1])**2*(2*(-(1/(x[:, 0]-x[:, 1]))))))+np.cos(x[:, 0]+x[:, 1])
+
+		return grad
+
+class MieleCantrell(Function):
+	"""
+	MieleCantrell [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.MieleCantrell]
+	"""
+	def __init__(self, c1=100.0, name="MieleCantrell"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 4
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-1, 1], [-1, 1], [-1, 1], [-1, 1]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(e^{-x_1} - x_2)^4 + c_1(x_2 - x_3)^6 + \tan^4(x_3 - x_4) + x_1^8
+
+
+		Default constant values are :math:`c = (100.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,4)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((np.exp(-x[:, 0])-x[:, 1])**4+(self.c1*(x[:, 1]-x[:, 2])**6))+(np.sin(x[:, 2]-x[:, 3])/np.cos(x[:, 2]-x[:, 3]))**4)+x[:, 0]**8).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((np.exp(-x[:, 0])-x[:, 1])**4*(4*((1/(np.exp(-x[:, 0])-x[:, 1]))*(-np.exp(-x[:, 0])))))+(x[:, 0]**8*(8*(1/x[:, 0])))
+		grad[:, 0, 1] = ((np.exp(-x[:, 0])-x[:, 1])**4*(4*(-(1/(np.exp(-x[:, 0])-x[:, 1])))))+(self.c1*((x[:, 1]-x[:, 2])**6*(6*(1/(x[:, 1]-x[:, 2])))))
+		grad[:, 0, 2] = (self.c1*((x[:, 1]-x[:, 2])**6*(6*(-(1/(x[:, 1]-x[:, 2]))))))+(np.sin(x[:, 2]-x[:, 3])**4*(4*((1/(np.sin(x[:, 2]-x[:, 3])/np.cos(x[:, 2]-x[:, 3])))*(((np.cos(x[:, 2]-x[:, 3])*np.cos(x[:, 2]-x[:, 3]))-(np.sin(x[:, 2]-x[:, 3])*(-np.sin(x[:, 2]-x[:, 3]))))/np.cos(x[:, 2]-x[:, 3])**2))))
+		grad[:, 0, 3] = np.sin(x[:, 2]-x[:, 3])**4*(4*((1/(np.sin(x[:, 2]-x[:, 3])/np.cos(x[:, 2]-x[:, 3])))*((((-np.cos(x[:, 2]-x[:, 3]))*np.cos(x[:, 2]-x[:, 3]))-(np.sin(x[:, 2]-x[:, 3])*(-(-np.sin(x[:, 2]-x[:, 3])))))/np.cos(x[:, 2]-x[:, 3])**2)))
+
+		return grad
+
+class Mishra03(Function):
+	"""
+	Mishra03 [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Mishra03]
+	"""
+	def __init__(self, c1=0.01, name="Mishra03"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\sqrt{\abs{\cos{\sqrt{\abs{x_1^2 + x_2^2}}}}} + c_1(x_1 + x_2)
+
+
+		Default constant values are :math:`c = (0.01)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (np.sqrt(np.abs(np.cos(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2)))))+(self.c1*(x[:, 0]+x[:, 1]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((1/(2*np.sqrt(x[:, 0])))*(np.sign(np.cos(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*((-np.sin(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*((1/(2*np.sqrt(x[:, 0])))*(np.sign(x[:, 0]**2+x[:, 1]**2)*(x[:, 0]**2*(2*(1/x[:, 0]))))))))+self.c1
+		grad[:, 0, 1] = ((1/(2*np.sqrt(x[:, 1])))*(np.sign(np.cos(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*((-np.sin(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*((1/(2*np.sqrt(x[:, 1])))*(np.sign(x[:, 0]**2+x[:, 1]**2)*(x[:, 1]**2*(2*(1/x[:, 1]))))))))+self.c1
+
+		return grad
+
+class Mishra04(Function):
+	"""
+	Mishra04 [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Mishra04]
+	"""
+	def __init__(self, c1=0.01, name="Mishra04"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\sqrt{\abs{\sin{\sqrt{\abs{x_1^2 + x_2^2}}}}} + c_1(x_1 + x_2)
+
+
+		Default constant values are :math:`c = (0.01)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (np.sqrt(np.abs(np.sin(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2)))))+(self.c1*(x[:, 0]+x[:, 1]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((1/(2*np.sqrt(x[:, 0])))*(np.sign(np.sin(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*(np.cos(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2)))*((1/(2*np.sqrt(x[:, 0])))*(np.sign(x[:, 0]**2+x[:, 1]**2)*(x[:, 0]**2*(2*(1/x[:, 0]))))))))+self.c1
+		grad[:, 0, 1] = ((1/(2*np.sqrt(x[:, 1])))*(np.sign(np.sin(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2))))*(np.cos(np.sqrt(np.abs(x[:, 0]**2+x[:, 1]**2)))*((1/(2*np.sqrt(x[:, 1])))*(np.sign(x[:, 0]**2+x[:, 1]**2)*(x[:, 1]**2*(2*(1/x[:, 1]))))))))+self.c1
+
+		return grad
+
+class Mishra05(Function):
+	"""
+	Mishra05 [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Mishra05]
+	"""
+	def __init__(self, c1=0.01, name="Mishra05"):
+		super().__init__()
+		self.name = name
+		self.c1 = c1
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left [ \sin^2 ((\cos(x_1) + \cos(x_2))^2) + \cos^2 ((\sin(x_1) + \sin(x_2))^2) + x_1 \right ]^2 + c_1(x_1 + x_2)
+
+
+		Default constant values are :math:`c = (0.01)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2+(self.c1*(x[:, 0]+x[:, 1]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2*(2*((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0]))*(((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 0])))))))))+(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 0])))))))))+1))))+self.c1
+		grad[:, 0, 1] = (((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2*(2*((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0]))*((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 1])))))))))+(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 1]))))))))))))+self.c1
+
+		return grad
+
+class Mishra06(Function):
+	"""
+	Mishra06 [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Mishra06]
+	"""
+	def __init__(self, c1=0.01, c2=1.0, c3=1.0, name="Mishra06"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=-\log{\left [ \sin^2 ((\cos(x_1) + \cos(x_2))^2) - \cos^2 ((\sin(x_1) + \sin(x_2))^2) + x_1 \right ]^2} + c_1 \left[(x_1 -c_2)^2 + (x_2 - c_3)^2 \right]
+
+
+		Default constant values are :math:`c = (0.01, 1.0, 1.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((-np.log(((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2))+(self.c1*((x[:, 0]-self.c2)**2+(x[:, 1]-self.c3)**2))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (-((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2)*(((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2*(2*((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0]))*(((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 0])))))))))-(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 0])))))))))+1))))))+(self.c1*((x[:, 0]-self.c2)**2*(2*(1/(x[:, 0]-self.c2)))))
+		grad[:, 0, 1] = (-((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2)*(((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0])**2*(2*((1/((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2-np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)+x[:, 0]))*((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 1])))))))))-(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 1]))))))))))))))+(self.c1*((x[:, 1]-self.c3)**2*(2*(1/(x[:, 1]-self.c3)))))
+
+		return grad
+
+class Mishra08(Function):
+	"""
+	Mishra08 [https://infinity77.net/global_optimization/test_functions_nd_M.html#go_benchmark.Mishra08]
+	"""
+	def __init__(self, name="Mishra08"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=0.001 \left[\abs{ x_1^{10} - 20x_1^9 + 180x_1^8 - 960 x_1^7 + 3360x_1^6 - 8064x_1^5 + 13340x_1^4 - 15360x_1^3 + 11520x_1^2 - 5120x_1 + 2624 } \abs{ x_2^4 + 12x_2^3 + 54x_2^2 + 108x_2 + 81 } \right]^2
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (0).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = 0
+		grad[:, 0, 1] = 0
+
+		return grad
+
+class NewFunction03(Function):
+	"""
+	NewFunction03 [https://infinity77.net/global_optimization/test_functions_nd_N.html#go_benchmark.NewFunction03]
+	"""
+	def __init__(self, c1=0.01, c2=0.1, name="NewFunction03"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 x_{1} + c_2 x_{2} + \left[x_{1} + \sin^{2}\left[\left(\cos\left(x_{1}\right) + \cos\left(x_{2}\right)\right)^{2}\right] + \cos^{2}\left[\left(\sin\left(x_{1}\right) + \sin\left(x_{2}\right)\right)^{2}\right]\right]^{2}
+
+
+		Default constant values are :math:`c = (0.01, 0.1)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1*x[:, 0])+(self.c2*x[:, 1]))+((x[:, 0]+np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2)+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = self.c1+(((x[:, 0]+np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2)+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)**2*(2*((1/((x[:, 0]+np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2)+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2))*((1+(np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 0]))))))))))+(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 0]))))))))))))
+		grad[:, 0, 1] = self.c2+(((x[:, 0]+np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2)+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2)**2*(2*((1/((x[:, 0]+np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2)+np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2))*((np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)**2*(2*((1/np.sin((np.cos(x[:, 0])+np.cos(x[:, 1]))**2))*(np.cos((np.cos(x[:, 0])+np.cos(x[:, 1]))**2)*((np.cos(x[:, 0])+np.cos(x[:, 1]))**2*(2*((1/(np.cos(x[:, 0])+np.cos(x[:, 1])))*(-np.sin(x[:, 1])))))))))+(np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2)**2*(2*((1/np.cos((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((-np.sin((np.sin(x[:, 0])+np.sin(x[:, 1]))**2))*((np.sin(x[:, 0])+np.sin(x[:, 1]))**2*(2*((1/(np.sin(x[:, 0])+np.sin(x[:, 1])))*np.cos(x[:, 1]))))))))))))
+
+		return grad
+
+class Parsopoulos(Function):
+	"""
+	Parsopoulos [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Parsopoulos]
+	"""
+	def __init__(self, name="Parsopoulos"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\cos(x_1)^2 + \sin(x_2)^2
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (np.cos(x[:, 0])**2+np.sin(x[:, 1])**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = np.cos(x[:, 0])**2*(2*((1/np.cos(x[:, 0]))*(-np.sin(x[:, 0]))))
+		grad[:, 0, 1] = np.sin(x[:, 1])**2*(2*((1/np.sin(x[:, 1]))*np.cos(x[:, 1])))
+
+		return grad
+
+class Powell(Function):
+	"""
+	Powell [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Powell]
+	"""
+	def __init__(self, c1=10.0, c2=5.0, c3=2.0, c4=10.0, name="Powell"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 4
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-4, 5], [-4, 5], [-4, 5], [-4, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(x_3+c_1x_1)^2+c_2(x_2-x_4)^2+(x_1-c_3x_2)^4+c_4(x_3-x_4)^4
+
+
+		Default constant values are :math:`c = (10.0, 5.0, 2.0, 10.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,4)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((x[:, 2]+(self.c1*x[:, 0]))**2+(self.c2*(x[:, 1]-x[:, 3])**2))+(x[:, 0]-(self.c3*x[:, 1]))**4)+(self.c4*(x[:, 2]-x[:, 3])**4)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((x[:, 2]+(self.c1*x[:, 0]))**2*(2*((1/(x[:, 2]+(self.c1*x[:, 0])))*self.c1)))+((x[:, 0]-(self.c3*x[:, 1]))**4*(4*(1/(x[:, 0]-(self.c3*x[:, 1])))))
+		grad[:, 0, 1] = (self.c2*((x[:, 1]-x[:, 3])**2*(2*(1/(x[:, 1]-x[:, 3])))))+((x[:, 0]-(self.c3*x[:, 1]))**4*(4*((1/(x[:, 0]-(self.c3*x[:, 1])))*(-self.c3))))
+		grad[:, 0, 2] = ((x[:, 2]+(self.c1*x[:, 0]))**2*(2*(1/(x[:, 2]+(self.c1*x[:, 0])))))+(self.c4*((x[:, 2]-x[:, 3])**4*(4*(1/(x[:, 2]-x[:, 3])))))
+		grad[:, 0, 3] = (self.c2*((x[:, 1]-x[:, 3])**2*(2*(-(1/(x[:, 1]-x[:, 3]))))))+(self.c4*((x[:, 2]-x[:, 3])**4*(4*(-(1/(x[:, 2]-x[:, 3]))))))
+
+		return grad
+
+class Price01(Function):
+	"""
+	Price01 [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Price01]
+	"""
+	def __init__(self, c1=5, c2=5, name="Price01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-500, 500], [-500, 500]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(\abs{ x_1 } - c_1)^2 + (\abs{ x_2 } - c_2)^2
+
+
+		Default constant values are :math:`c = (5, 5)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((np.abs(x[:, 0])-self.c1)**2+(np.abs(x[:, 1])-self.c2)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (np.abs(x[:, 0])-self.c1)**2*(2*((1/(np.abs(x[:, 0])-self.c1))*np.sign(x[:, 0])))
+		grad[:, 0, 1] = (np.abs(x[:, 1])-self.c2)**2*(2*((1/(np.abs(x[:, 1])-self.c2))*np.sign(x[:, 1])))
+
+		return grad
+
+class Price02(Function):
+	"""
+	Price02 [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Price02]
+	"""
+	def __init__(self, c1=1.0, c2=0.1, name="Price02"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 + \sin^2(x_1) + \sin^2(x_2) - c_2e^{(-x_1^2 - x_2^2)}
+
+
+		Default constant values are :math:`c = (1.0, 0.1)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1+np.sin(x[:, 0])**2)+np.sin(x[:, 1])**2)-(self.c2*np.exp((-x[:, 0]**2)-x[:, 1]**2))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (np.sin(x[:, 0])**2*(2*((1/np.sin(x[:, 0]))*np.cos(x[:, 0]))))-(self.c2*(np.exp((-x[:, 0]**2)-x[:, 1]**2)*(-(x[:, 0]**2*(2*(1/x[:, 0]))))))
+		grad[:, 0, 1] = (np.sin(x[:, 1])**2*(2*((1/np.sin(x[:, 1]))*np.cos(x[:, 1]))))-(self.c2*(np.exp((-x[:, 0]**2)-x[:, 1]**2)*(-(x[:, 1]**2*(2*(1/x[:, 1]))))))
+
+		return grad
+
+class Price03(Function):
+	"""
+	Price03 [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Price03]
+	"""
+	def __init__(self, c1=100, c2=6.4, c3=0.5, c4=0.6, name="Price03"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-50, 50], [-50, 50]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1(x_2 - x_1^2)^2 + \left[c_2(x_2 - c_3)^2 - x_1 - c_4 \right]^2
+
+
+		Default constant values are :math:`c = (100, 6.4, 0.5, 0.6)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((self.c1*(x[:, 1]-x[:, 0]**2)**2)+(((self.c2*(x[:, 1]-self.c3)**2)-x[:, 0])-self.c4)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (self.c1*((x[:, 1]-x[:, 0]**2)**2*(2*((1/(x[:, 1]-x[:, 0]**2))*(-(x[:, 0]**2*(2*(1/x[:, 0]))))))))+((((self.c2*(x[:, 1]-self.c3)**2)-x[:, 0])-self.c4)**2*(2*(-(1/(((self.c2*(x[:, 1]-self.c3)**2)-x[:, 0])-self.c4)))))
+		grad[:, 0, 1] = (self.c1*((x[:, 1]-x[:, 0]**2)**2*(2*(1/(x[:, 1]-x[:, 0]**2)))))+((((self.c2*(x[:, 1]-self.c3)**2)-x[:, 0])-self.c4)**2*(2*((1/(((self.c2*(x[:, 1]-self.c3)**2)-x[:, 0])-self.c4))*(self.c2*((x[:, 1]-self.c3)**2*(2*(1/(x[:, 1]-self.c3))))))))
+
+		return grad
+
+class Price04(Function):
+	"""
+	Price04 [https://infinity77.net/global_optimization/test_functions_nd_P.html#go_benchmark.Price04]
+	"""
+	def __init__(self, c1=2, c2=6, name="Price04"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-50, 50], [-50, 50]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(c_1x_1^3x_2 - x_2^3)^2 + (c_2x_1 - x_2^2 + x_2)^2
+
+
+		Default constant values are :math:`c = (2, 6)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((self.c1*x[:, 0]**3)*x[:, 1])-x[:, 1]**3)**2+(((self.c2*x[:, 0])-x[:, 1]**2)+x[:, 1])**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((((self.c1*x[:, 0]**3)*x[:, 1])-x[:, 1]**3)**2*(2*((1/(((self.c1*x[:, 0]**3)*x[:, 1])-x[:, 1]**3))*((self.c1*(x[:, 0]**3*(3*(1/x[:, 0]))))*x[:, 1]))))+((((self.c2*x[:, 0])-x[:, 1]**2)+x[:, 1])**2*(2*((1/(((self.c2*x[:, 0])-x[:, 1]**2)+x[:, 1]))*self.c2)))
+		grad[:, 0, 1] = ((((self.c1*x[:, 0]**3)*x[:, 1])-x[:, 1]**3)**2*(2*((1/(((self.c1*x[:, 0]**3)*x[:, 1])-x[:, 1]**3))*((self.c1*x[:, 0]**3)-(x[:, 1]**3*(3*(1/x[:, 1])))))))+((((self.c2*x[:, 0])-x[:, 1]**2)+x[:, 1])**2*(2*((1/(((self.c2*x[:, 0])-x[:, 1]**2)+x[:, 1]))*((-(x[:, 1]**2*(2*(1/x[:, 1]))))+1))))
+
+		return grad
+
+class Quadratic(Function):
+	"""
+	Quadratic [https://infinity77.net/global_optimization/test_functions_nd_Q.html#go_benchmark.Quadratic]
+	"""
+	def __init__(self, name="Quadratic"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=-3803.84 - 138.08x_1 - 232.92x_2 + 128.08x_1^2 + 203.64x_2^2 + 182.25x_1x_2
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((((-3803)-(138*x[:, 0]))-(232*x[:, 1]))+(128*x[:, 0]**2))+(203*x[:, 1]**2))+((182*x[:, 0])*x[:, 1])).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((-138)+(128*(x[:, 0]**2*(2*(1/x[:, 0])))))+(182*x[:, 1])
+		grad[:, 0, 1] = ((-232)+(203*(x[:, 1]**2*(2*(1/x[:, 1])))))+(182*x[:, 0])
+
+		return grad
+
+class RosenbrockModified(Function):
+	"""
+	RosenbrockModified [https://infinity77.net/global_optimization/test_functions_nd_R.html#go_benchmark.RosenbrockModified]
+	"""
+	def __init__(self, c1=74, c2=100, c3=1, c4=400, c5=0.1, name="RosenbrockModified"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-2, 2], [-2, 2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 + c_2(x_2 - x_1^2)^2 + (c_3 - x_1)^2 - c_4 e^{-\frac{(x_1+1)^2 + (x_2 + 1)^2}{c_5}}
+
+
+		Default constant values are :math:`c = (74, 100, 1, 400, 0.1)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1+(self.c2*(x[:, 1]-x[:, 0]**2)**2))+(self.c3-x[:, 0])**2)-(self.c4*np.exp(-(((x[:, 0]+1)**2+(x[:, 1]+1)**2)/self.c5)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((self.c2*((x[:, 1]-x[:, 0]**2)**2*(2*((1/(x[:, 1]-x[:, 0]**2))*(-(x[:, 0]**2*(2*(1/x[:, 0]))))))))+((self.c3-x[:, 0])**2*(2*(-(1/(self.c3-x[:, 0]))))))-(self.c4*(np.exp(-(((x[:, 0]+1)**2+(x[:, 1]+1)**2)/self.c5))*(-((((x[:, 0]+1)**2*(2*(1/(x[:, 0]+1))))*self.c5)/self.c5**2))))
+		grad[:, 0, 1] = (self.c2*((x[:, 1]-x[:, 0]**2)**2*(2*(1/(x[:, 1]-x[:, 0]**2)))))-(self.c4*(np.exp(-(((x[:, 0]+1)**2+(x[:, 1]+1)**2)/self.c5))*(-((((x[:, 1]+1)**2*(2*(1/(x[:, 1]+1))))*self.c5)/self.c5**2))))
+
+		return grad
+
+class RotatedEllipse01(Function):
+	"""
+	RotatedEllipse01 [https://infinity77.net/global_optimization/test_functions_nd_R.html#go_benchmark.RotatedEllipse01]
+	"""
+	def __init__(self, c1=7, c2=10.392304845413264, c3=13, name="RotatedEllipse01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-500, 500], [-500, 500]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1x_1^2 - c_2 x_1x_2 + c_3x_2^2
+
+
+		Default constant values are :math:`c = (7, 10.392304845413264, 13)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1*x[:, 0]**2)-((self.c2*x[:, 0])*x[:, 1]))+(self.c3*x[:, 1]**2)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (self.c1*(x[:, 0]**2*(2*(1/x[:, 0]))))-(self.c2*x[:, 1])
+		grad[:, 0, 1] = (-(self.c2*x[:, 0]))+(self.c3*(x[:, 1]**2*(2*(1/x[:, 1]))))
+
+		return grad
+
+class RotatedEllipse02(Function):
+	"""
+	RotatedEllipse02 [https://infinity77.net/global_optimization/test_functions_nd_R.html#go_benchmark.RotatedEllipse02]
+	"""
+	def __init__(self, name="RotatedEllipse02"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-500, 500], [-500, 500]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=x_1^2 - x_1x_2 + x_2^2
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((x[:, 0]**2-(x[:, 0]*x[:, 1]))+x[:, 1]**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (x[:, 0]**2*(2*(1/x[:, 0])))-x[:, 1]
+		grad[:, 0, 1] = (-x[:, 0])+(x[:, 1]**2*(2*(1/x[:, 1])))
+
+		return grad
+
+class Schaffer01(Function):
+	"""
+	Schaffer01 [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.Schaffer01]
+	"""
+	def __init__(self, c1=0.5, c2=0.5, c3=1, c4=0.001, name="Schaffer01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-100, 100], [-100, 100]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 + \frac{\sin^2 (x_1^2 + x_2^2)^2 - c_2}{c_3 + c_4(x_1^2 + x_2^2)^2}
+
+
+		Default constant values are :math:`c = (0.5, 0.5, 1, 0.001)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (self.c1+((np.sin(x[:, 0]**2+x[:, 1]**2)**2**2-self.c2)/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((np.sin(x[:, 0]**2+x[:, 1]**2)**2**2*(2*((1/np.sin(x[:, 0]**2+x[:, 1]**2)**2)*(np.sin(x[:, 0]**2+x[:, 1]**2)**2*(2*((1/np.sin(x[:, 0]**2+x[:, 1]**2))*(np.cos(x[:, 0]**2+x[:, 1]**2)*(x[:, 0]**2*(2*(1/x[:, 0]))))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.sin(x[:, 0]**2+x[:, 1]**2)**2**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 0]**2*(2*(1/x[:, 0])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+		grad[:, 0, 1] = (((np.sin(x[:, 0]**2+x[:, 1]**2)**2**2*(2*((1/np.sin(x[:, 0]**2+x[:, 1]**2)**2)*(np.sin(x[:, 0]**2+x[:, 1]**2)**2*(2*((1/np.sin(x[:, 0]**2+x[:, 1]**2))*(np.cos(x[:, 0]**2+x[:, 1]**2)*(x[:, 1]**2*(2*(1/x[:, 1]))))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.sin(x[:, 0]**2+x[:, 1]**2)**2**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 1]**2*(2*(1/x[:, 1])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+
+		return grad
+
+class Schaffer02(Function):
+	"""
+	Schaffer02 [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.Schaffer02]
+	"""
+	def __init__(self, c1=0.5, c2=0.5, c3=1, c4=0.001, name="Schaffer02"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-100, 100], [-100, 100]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 + \frac{\sin^2 (x_1^2 - x_2^2)^2 - c_2}{c_3 + c_4(x_1^2 + x_2^2)^2}
+
+
+		Default constant values are :math:`c = (0.5, 0.5, 1, 0.001)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (self.c1+((np.sin(x[:, 0]**2-x[:, 1]**2)**2**2-self.c2)/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((np.sin(x[:, 0]**2-x[:, 1]**2)**2**2*(2*((1/np.sin(x[:, 0]**2-x[:, 1]**2)**2)*(np.sin(x[:, 0]**2-x[:, 1]**2)**2*(2*((1/np.sin(x[:, 0]**2-x[:, 1]**2))*(np.cos(x[:, 0]**2-x[:, 1]**2)*(x[:, 0]**2*(2*(1/x[:, 0]))))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.sin(x[:, 0]**2-x[:, 1]**2)**2**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 0]**2*(2*(1/x[:, 0])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+		grad[:, 0, 1] = (((np.sin(x[:, 0]**2-x[:, 1]**2)**2**2*(2*((1/np.sin(x[:, 0]**2-x[:, 1]**2)**2)*(np.sin(x[:, 0]**2-x[:, 1]**2)**2*(2*((1/np.sin(x[:, 0]**2-x[:, 1]**2))*(np.cos(x[:, 0]**2-x[:, 1]**2)*(-(x[:, 1]**2*(2*(1/x[:, 1])))))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.sin(x[:, 0]**2-x[:, 1]**2)**2**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 1]**2*(2*(1/x[:, 1])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+
+		return grad
+
+class Schaffer04(Function):
+	"""
+	Schaffer04 [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.Schaffer04]
+	"""
+	def __init__(self, c1=0.5, c2=0.5, c3=1, c4=0.001, name="Schaffer04"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-100, 100], [-100, 100]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 + \frac{\cos^2 \left( \sin(x_1^2 - x_2^2) \right ) - c_2}{c_3 + c_4(x_1^2 + x_2^2)^2}
+
+
+		Default constant values are :math:`c = (0.5, 0.5, 1, 0.001)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (self.c1+((np.cos(np.sin(x[:, 0]**2-x[:, 1]**2))**2-self.c2)/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((np.cos(np.sin(x[:, 0]**2-x[:, 1]**2))**2*(2*((1/np.cos(np.sin(x[:, 0]**2-x[:, 1]**2)))*((-np.sin(np.sin(x[:, 0]**2-x[:, 1]**2)))*(np.cos(x[:, 0]**2-x[:, 1]**2)*(x[:, 0]**2*(2*(1/x[:, 0]))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.cos(np.sin(x[:, 0]**2-x[:, 1]**2))**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 0]**2*(2*(1/x[:, 0])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+		grad[:, 0, 1] = (((np.cos(np.sin(x[:, 0]**2-x[:, 1]**2))**2*(2*((1/np.cos(np.sin(x[:, 0]**2-x[:, 1]**2)))*((-np.sin(np.sin(x[:, 0]**2-x[:, 1]**2)))*(np.cos(x[:, 0]**2-x[:, 1]**2)*(-(x[:, 1]**2*(2*(1/x[:, 1])))))))))*(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2)))-((np.cos(np.sin(x[:, 0]**2-x[:, 1]**2))**2-self.c2)*(self.c4*((x[:, 0]**2+x[:, 1]**2)**2*(2*((1/(x[:, 0]**2+x[:, 1]**2))*(x[:, 1]**2*(2*(1/x[:, 1])))))))))/(self.c3+(self.c4*(x[:, 0]**2+x[:, 1]**2)**2))**2
+
+		return grad
+
+class SchmidtVetters(Function):
+	"""
+	SchmidtVetters [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.SchmidtVetters]
+	"""
+	def __init__(self, c1=1, c2=1, c3=2, c4=2, name="SchmidtVetters"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 3
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0, 10], [0, 10], [0, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\frac{c_1}{c_2 + (x_1 - x_2)^2} + \sin \left(\frac{\pi x_2 + x_3}{c_3} \right) + e^{\left(\frac{x_1+x_2}{x_2} - c_4\right)^2}
+
+
+		Default constant values are :math:`c = (1, 1, 2, 2)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,3)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1/(self.c2+(x[:, 0]-x[:, 1])**2))+np.sin(((np.pi*x[:, 1])+x[:, 2])/self.c3))+np.exp((((x[:, 0]+x[:, 1])/x[:, 1])-self.c4)**2)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((-(self.c1*((x[:, 0]-x[:, 1])**2*(2*(1/(x[:, 0]-x[:, 1]))))))/(self.c2+(x[:, 0]-x[:, 1])**2)**2)+(np.exp((((x[:, 0]+x[:, 1])/x[:, 1])-self.c4)**2)*((((x[:, 0]+x[:, 1])/x[:, 1])-self.c4)**2*(2*((1/(((x[:, 0]+x[:, 1])/x[:, 1])-self.c4))*(x[:, 1]/x[:, 1]**2)))))
+		grad[:, 0, 1] = (((-(self.c1*((x[:, 0]-x[:, 1])**2*(2*(-(1/(x[:, 0]-x[:, 1])))))))/(self.c2+(x[:, 0]-x[:, 1])**2)**2)+(np.cos(((np.pi*x[:, 1])+x[:, 2])/self.c3)*((np.pi*self.c3)/self.c3**2)))+(np.exp((((x[:, 0]+x[:, 1])/x[:, 1])-self.c4)**2)*((((x[:, 0]+x[:, 1])/x[:, 1])-self.c4)**2*(2*((1/(((x[:, 0]+x[:, 1])/x[:, 1])-self.c4))*((x[:, 1]-(x[:, 0]+x[:, 1]))/x[:, 1]**2)))))
+		grad[:, 0, 2] = np.cos(((np.pi*x[:, 1])+x[:, 2])/self.c3)*(self.c3/self.c3**2)
+
+		return grad
+
+class Schwefel36(Function):
+	"""
+	Schwefel36 [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.Schwefel36]
+	"""
+	def __init__(self, c1=72, c2=2, c3=2, name="Schwefel36"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0, 500], [0, 500]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=-x_1x_2(c_1 - c_2x_1 - c_3x_2)
+
+
+		Default constant values are :math:`c = (72, 2, 2)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((-x[:, 0])*x[:, 1])*((self.c1-(self.c2*x[:, 0]))-(self.c3*x[:, 1]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((-x[:, 1])*((self.c1-(self.c2*x[:, 0]))-(self.c3*x[:, 1])))+(((-x[:, 0])*x[:, 1])*(-self.c2))
+		grad[:, 0, 1] = ((-x[:, 0])*((self.c1-(self.c2*x[:, 0]))-(self.c3*x[:, 1])))+(((-x[:, 0])*x[:, 1])*(-self.c3))
+
+		return grad
+
+class SixHumpCamel(Function):
+	"""
+	SixHumpCamel [https://infinity77.net/global_optimization/test_functions_nd_S.html#go_benchmark.SixHumpCamel]
+	"""
+	def __init__(self, c1=4, c2=4, c3=2.1, c4=4, c5=0.3333333333333333, name="SixHumpCamel"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1x_1^2+x_1x_2-c_2x_2^2-c_3x_1^4+c_4x_2^4+c_5x_1^6
+
+
+		Default constant values are :math:`c = (4, 4, 2.1, 4, 0.3333333333333333)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((((self.c1*x[:, 0]**2)+(x[:, 0]*x[:, 1]))-(self.c2*x[:, 1]**2))-(self.c3*x[:, 0]**4))+(self.c4*x[:, 1]**4))+(self.c5*x[:, 0]**6)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((self.c1*(x[:, 0]**2*(2*(1/x[:, 0]))))+x[:, 1])-(self.c3*(x[:, 0]**4*(4*(1/x[:, 0])))))+(self.c5*(x[:, 0]**6*(6*(1/x[:, 0]))))
+		grad[:, 0, 1] = (x[:, 0]-(self.c2*(x[:, 1]**2*(2*(1/x[:, 1])))))+(self.c4*(x[:, 1]**4*(4*(1/x[:, 1]))))
+
+		return grad
+
+class ThreeHumpCamel(Function):
+	"""
+	ThreeHumpCamel [https://infinity77.net/global_optimization/test_functions_nd_T.html#go_benchmark.ThreeHumpCamel]
+	"""
+	def __init__(self, c1=2, c2=1.05, c3=6, name="ThreeHumpCamel"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1x_1^2 - c_2x_1^4 + \frac{x_1^6}{c_3} + x_1x_2 + x_2^2
+
+
+		Default constant values are :math:`c = (2, 1.05, 6)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((((self.c1*x[:, 0]**2)-(self.c2*x[:, 0]**4))+(x[:, 0]**6/self.c3))+(x[:, 0]*x[:, 1]))+x[:, 1]**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((self.c1*(x[:, 0]**2*(2*(1/x[:, 0]))))-(self.c2*(x[:, 0]**4*(4*(1/x[:, 0])))))+(((x[:, 0]**6*(6*(1/x[:, 0])))*self.c3)/self.c3**2))+x[:, 1]
+		grad[:, 0, 1] = x[:, 0]+(x[:, 1]**2*(2*(1/x[:, 1])))
+
+		return grad
+
+class Treccani(Function):
+	"""
+	Treccani [https://infinity77.net/global_optimization/test_functions_nd_T.html#go_benchmark.Treccani]
+	"""
+	def __init__(self, c1=4, c2=4, name="Treccani"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=x_1^4 + c_1x_1^3 + c_2x_1^2 + x_2^2
+
+
+		Default constant values are :math:`c = (4, 4)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((x[:, 0]**4+(self.c1*x[:, 0]**3))+(self.c2*x[:, 0]**2))+x[:, 1]**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((x[:, 0]**4*(4*(1/x[:, 0])))+(self.c1*(x[:, 0]**3*(3*(1/x[:, 0])))))+(self.c2*(x[:, 0]**2*(2*(1/x[:, 0]))))
+		grad[:, 0, 1] = x[:, 1]**2*(2*(1/x[:, 1]))
+
+		return grad
+
+class Trefethen(Function):
+	"""
+	Trefethen [https://infinity77.net/global_optimization/test_functions_nd_T.html#go_benchmark.Trefethen]
+	"""
+	def __init__(self, name="Trefethen"):
+		super().__init__()
+		self.name = name
+		
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=0.25 x_{1}^{2} + 0.25 x_{2}^{2} + e^{\sin\left(50 x_{1}\right)} - \sin\left(10 x_{1} + 10 x_{2}\right) + \sin\left(60 e^{x_{2}}\right) + \sin\left[70 \sin\left(x_{1}\right)\right] + \sin\left[\sin\left(80 x_{2}\right)\right]
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((np.exp(np.sin(50*x[:, 0]))-np.sin((10*x[:, 0])+(10*x[:, 1])))+np.sin(60*np.exp(x[:, 1])))+np.sin(70*np.sin(x[:, 0])))+np.sin(np.sin(80*x[:, 1]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((np.exp(np.sin(50*x[:, 0]))*(np.cos(50*x[:, 0])*50))-(np.cos((10*x[:, 0])+(10*x[:, 1]))*10))+(np.cos(70*np.sin(x[:, 0]))*(70*np.cos(x[:, 0])))
+		grad[:, 0, 1] = ((-(np.cos((10*x[:, 0])+(10*x[:, 1]))*10))+(np.cos(60*np.exp(x[:, 1]))*(60*np.exp(x[:, 1]))))+(np.cos(np.sin(80*x[:, 1]))*(np.cos(80*x[:, 1])*80))
+
+		return grad
+
+class Ursem01(Function):
+	"""
+	Ursem01 [https://infinity77.net/global_optimization/test_functions_nd_U.html#go_benchmark.Ursem01]
+	"""
+	def __init__(self, c1=2, c2=0.5, c3=3, c4=0.5, name="Ursem01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-2.5, 3], [-2, 2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=- \sin(c_1x_1 - c_2 \pi) - c_3 \cos(x_2) - c_4x_1
+
+
+		Default constant values are :math:`c = (2, 0.5, 3, 0.5)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((-np.sin((self.c1*x[:, 0])-(self.c2*np.pi)))-(self.c3*np.cos(x[:, 1])))-(self.c4*x[:, 0])).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (-(np.cos((self.c1*x[:, 0])-(self.c2*np.pi))*self.c1))-self.c4
+		grad[:, 0, 1] = -(self.c3*(-np.sin(x[:, 1])))
+
+		return grad
+
+class Ursem03(Function):
+	"""
+	Ursem03 [https://infinity77.net/global_optimization/test_functions_nd_U.html#go_benchmark.Ursem03]
+	"""
+	def __init__(self, c1=2.2, c2=0.5, c3=2, c4=2, c5=3, c6=2, c7=2.2, c8=0.5, c9=2, c10=2, c11=3, c12=2, name="Ursem03"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7, self.c8, self.c9, self.c10, self.c11, self.c12 = c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-2, 2], [-1.5, 1.5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=- \sin(c_1 \pi x_1 + c_2 \pi) \frac{c_3 - \abs{ x_1 }}{c_4} \frac{c_5 - \abs{ x_1 }}{c_6} - \sin(c_7 \pi x_2 + c_8 \pi) \frac{c_9 - \abs{ x_2 }}{c_{10}} \frac{c_{11} - \abs{ x_2 }}{c_{12}}
+
+
+		Default constant values are :math:`c = (2.2, 0.5, 2, 2, 3, 2, 2.2, 0.5, 2, 2, 3, 2)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((-np.sin(((self.c1*np.pi)*x[:, 0])+(self.c2*np.pi)))*((self.c3-np.abs(x[:, 0]))/self.c4))*((self.c5-np.abs(x[:, 0]))/self.c6))-((np.sin(((self.c7*np.pi)*x[:, 1])+(self.c8*np.pi))*((self.c9-np.abs(x[:, 1]))/self.c10))*((self.c11-np.abs(x[:, 1]))/self.c12))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((((-(np.cos(((self.c1*np.pi)*x[:, 0])+(self.c2*np.pi))*(self.c1*np.pi)))*((self.c3-np.abs(x[:, 0]))/self.c4))+((-np.sin(((self.c1*np.pi)*x[:, 0])+(self.c2*np.pi)))*(((-np.sign(x[:, 0]))*self.c4)/self.c4**2)))*((self.c5-np.abs(x[:, 0]))/self.c6))+(((-np.sin(((self.c1*np.pi)*x[:, 0])+(self.c2*np.pi)))*((self.c3-np.abs(x[:, 0]))/self.c4))*(((-np.sign(x[:, 0]))*self.c6)/self.c6**2))
+		grad[:, 0, 1] = -(((((np.cos(((self.c7*np.pi)*x[:, 1])+(self.c8*np.pi))*(self.c7*np.pi))*((self.c9-np.abs(x[:, 1]))/self.c10))+(np.sin(((self.c7*np.pi)*x[:, 1])+(self.c8*np.pi))*(((-np.sign(x[:, 1]))*self.c10)/self.c10**2)))*((self.c11-np.abs(x[:, 1]))/self.c12))+((np.sin(((self.c7*np.pi)*x[:, 1])+(self.c8*np.pi))*((self.c9-np.abs(x[:, 1]))/self.c10))*(((-np.sign(x[:, 1]))*self.c12)/self.c12**2)))
+
+		return grad
+
+class Ursem04(Function):
+	"""
+	Ursem04 [https://infinity77.net/global_optimization/test_functions_nd_U.html#go_benchmark.Ursem04]
+	"""
+	def __init__(self, c1=3, c2=0.5, c3=0.5, c4=2, c5=4, name="Ursem04"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5 = c1, c2, c3, c4, c5
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-2, 2], [-2, 2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=-c_1 \sin(c_2 \pi x_1 + c_3 \pi) \frac{c_4 - \sqrt{x_1^2 + x_2 ^ 2}}{c_5}
+
+
+		Default constant values are :math:`c = (3, 0.5, 0.5, 2, 4)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((-self.c1)*np.sin(((self.c2*np.pi)*x[:, 0])+(self.c3*np.pi)))*((self.c4-np.sqrt(x[:, 0]**2+x[:, 1]**2))/self.c5)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((-self.c1)*(np.cos(((self.c2*np.pi)*x[:, 0])+(self.c3*np.pi))*(self.c2*np.pi)))*((self.c4-np.sqrt(x[:, 0]**2+x[:, 1]**2))/self.c5))+(((-self.c1)*np.sin(((self.c2*np.pi)*x[:, 0])+(self.c3*np.pi)))*(((-((1/(2*np.sqrt(x[:, 0])))*(x[:, 0]**2*(2*(1/x[:, 0])))))*self.c5)/self.c5**2))
+		grad[:, 0, 1] = ((-self.c1)*np.sin(((self.c2*np.pi)*x[:, 0])+(self.c3*np.pi)))*(((-((1/(2*np.sqrt(x[:, 1])))*(x[:, 1]**2*(2*(1/x[:, 1])))))*self.c5)/self.c5**2)
+
+		return grad
+
+class UrsemWaves(Function):
+	"""
+	UrsemWaves [https://infinity77.net/global_optimization/test_functions_nd_U.html#go_benchmark.UrsemWaves]
+	"""
+	def __init__(self, c1=0.9, c2=4.5, c3=4.7, c4=2, c5=2, c6=2.5, name="UrsemWaves"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6 = c1, c2, c3, c4, c5, c6
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-0.9, 1.2], [-1.2, 1.2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=-c_1x_1^2 + (x_2^2 - c_2x_2^2)x_1x_2 + c_3 \cos \left[ c_4x_1 - x_2^2(c_5 + x_1) \right ] \sin(c_6 \pi x_1)
+
+
+		Default constant values are :math:`c = (0.9, 4.5, 4.7, 2, 2, 2.5)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((-self.c1)*x[:, 0]**2)+(((x[:, 1]**2-(self.c2*x[:, 1]**2))*x[:, 0])*x[:, 1]))+((self.c3*np.cos((self.c4*x[:, 0])-(x[:, 1]**2*(self.c5+x[:, 0]))))*np.sin((self.c6*np.pi)*x[:, 0]))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((-self.c1)*(x[:, 0]**2*(2*(1/x[:, 0]))))+((x[:, 1]**2-(self.c2*x[:, 1]**2))*x[:, 1]))+(((self.c3*((-np.sin((self.c4*x[:, 0])-(x[:, 1]**2*(self.c5+x[:, 0]))))*(self.c4-x[:, 1]**2)))*np.sin((self.c6*np.pi)*x[:, 0]))+((self.c3*np.cos((self.c4*x[:, 0])-(x[:, 1]**2*(self.c5+x[:, 0]))))*(np.cos((self.c6*np.pi)*x[:, 0])*(self.c6*np.pi))))
+		grad[:, 0, 1] = (((((x[:, 1]**2*(2*(1/x[:, 1])))-(self.c2*(x[:, 1]**2*(2*(1/x[:, 1])))))*x[:, 0])*x[:, 1])+((x[:, 1]**2-(self.c2*x[:, 1]**2))*x[:, 0]))+((self.c3*((-np.sin((self.c4*x[:, 0])-(x[:, 1]**2*(self.c5+x[:, 0]))))*(-((x[:, 1]**2*(2*(1/x[:, 1])))*(self.c5+x[:, 0])))))*np.sin((self.c6*np.pi)*x[:, 0]))
+
+		return grad
+
+class VenterSobiezcczanskiSobieski(Function):
+	"""
+	VenterSobiezcczanskiSobieski [https://infinity77.net/global_optimization/test_functions_nd_V.html#go_benchmark.VenterSobiezcczanskiSobieski]
+	"""
+	def __init__(self, c1=100, c2=100, c3=30, c4=100, c5=100, c6=30, name="VenterSobiezcczanskiSobieski"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6 = c1, c2, c3, c4, c5, c6
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-50, 50], [-50, 50]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=x_1^2 - c_1 \cos^2(x_1) - c_2 \cos(x_1^2/c_3) + x_2^2 - c_4 \cos^2(x_2) - c_5 \cos(x_2^2/c_6)
+
+
+		Default constant values are :math:`c = (100, 100, 30, 100, 100, 30)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((((x[:, 0]**2-(self.c1*np.cos(x[:, 0])**2))-(self.c2*np.cos(x[:, 0]**2/self.c3)))+x[:, 1]**2)-(self.c4*np.cos(x[:, 1])**2))-(self.c5*np.cos(x[:, 1]**2/self.c6))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((x[:, 0]**2*(2*(1/x[:, 0])))-(self.c1*(np.cos(x[:, 0])**2*(2*((1/np.cos(x[:, 0]))*(-np.sin(x[:, 0])))))))-(self.c2*((-np.sin(x[:, 0]**2/self.c3))*(((x[:, 0]**2*(2*(1/x[:, 0])))*self.c3)/self.c3**2)))
+		grad[:, 0, 1] = ((x[:, 1]**2*(2*(1/x[:, 1])))-(self.c4*(np.cos(x[:, 1])**2*(2*((1/np.cos(x[:, 1]))*(-np.sin(x[:, 1])))))))-(self.c5*((-np.sin(x[:, 1]**2/self.c6))*(((x[:, 1]**2*(2*(1/x[:, 1])))*self.c6)/self.c6**2)))
+
+		return grad
+
+class WayburnSeader01(Function):
+	"""
+	WayburnSeader01 [https://infinity77.net/global_optimization/test_functions_nd_W.html#go_benchmark.WayburnSeader01]
+	"""
+	def __init__(self, c1=17, c2=2, c3=4, name="WayburnSeader01"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3 = c1, c2, c3
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-5, 5], [-5, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=(x_1^6 + x_2^4 - c_1)^2 + (c_2x_1 + x_2 - c_3)^2
+
+
+		Default constant values are :math:`c = (17, 2, 4)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((x[:, 0]**6+x[:, 1]**4)-self.c1)**2+(((self.c2*x[:, 0])+x[:, 1])-self.c3)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((x[:, 0]**6+x[:, 1]**4)-self.c1)**2*(2*((1/((x[:, 0]**6+x[:, 1]**4)-self.c1))*(x[:, 0]**6*(6*(1/x[:, 0]))))))+((((self.c2*x[:, 0])+x[:, 1])-self.c3)**2*(2*((1/(((self.c2*x[:, 0])+x[:, 1])-self.c3))*self.c2)))
+		grad[:, 0, 1] = (((x[:, 0]**6+x[:, 1]**4)-self.c1)**2*(2*((1/((x[:, 0]**6+x[:, 1]**4)-self.c1))*(x[:, 1]**4*(4*(1/x[:, 1]))))))+((((self.c2*x[:, 0])+x[:, 1])-self.c3)**2*(2*(1/(((self.c2*x[:, 0])+x[:, 1])-self.c3))))
+
+		return grad
+
+class WayburnSeader02(Function):
+	"""
+	WayburnSeader02 [https://infinity77.net/global_optimization/test_functions_nd_W.html#go_benchmark.WayburnSeader02]
+	"""
+	def __init__(self, c1=1.613, c2=4, c3=0.3125, c4=4, c5=1.625, c6=1, name="WayburnSeader02"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6 = c1, c2, c3, c4, c5, c6
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-500, 500], [-500, 500]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left[ c_1 - c_2(x_1 - c_3)^2 - c_4(x_2 - c_5)^2 \right]^2 + (x_2 - c_6)^2
+
+
+		Default constant values are :math:`c = (1.613, 4, 0.3125, 4, 1.625, 1)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1-(self.c2*(x[:, 0]-self.c3)**2))-(self.c4*(x[:, 1]-self.c5)**2))**2+(x[:, 1]-self.c6)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((self.c1-(self.c2*(x[:, 0]-self.c3)**2))-(self.c4*(x[:, 1]-self.c5)**2))**2*(2*((1/((self.c1-(self.c2*(x[:, 0]-self.c3)**2))-(self.c4*(x[:, 1]-self.c5)**2)))*(-(self.c2*((x[:, 0]-self.c3)**2*(2*(1/(x[:, 0]-self.c3))))))))
+		grad[:, 0, 1] = (((self.c1-(self.c2*(x[:, 0]-self.c3)**2))-(self.c4*(x[:, 1]-self.c5)**2))**2*(2*((1/((self.c1-(self.c2*(x[:, 0]-self.c3)**2))-(self.c4*(x[:, 1]-self.c5)**2)))*(-(self.c4*((x[:, 1]-self.c5)**2*(2*(1/(x[:, 1]-self.c5)))))))))+((x[:, 1]-self.c6)**2*(2*(1/(x[:, 1]-self.c6))))
+
+		return grad
+
+class Wolfe(Function):
+	"""
+	Wolfe [https://infinity77.net/global_optimization/test_functions_nd_W.html#go_benchmark.Wolfe]
+	"""
+	def __init__(self, c1=1.3333333333333333, c2=0.75, name="Wolfe"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 3
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0, 2], [0, 2], [0, 2]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1(x_1^2 + x_2^2 - x_1x_2)^{c_2} + x_3
+
+
+		Default constant values are :math:`c = (1.3333333333333333, 0.75)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,3)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((self.c1*((x[:, 0]**2+x[:, 1]**2)-(x[:, 0]*x[:, 1]))**self.c2)+x[:, 2]).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = self.c1*(((x[:, 0]**2+x[:, 1]**2)-(x[:, 0]*x[:, 1]))**self.c2*(self.c2*((1/((x[:, 0]**2+x[:, 1]**2)-(x[:, 0]*x[:, 1])))*((x[:, 0]**2*(2*(1/x[:, 0])))-x[:, 1]))))
+		grad[:, 0, 1] = self.c1*(((x[:, 0]**2+x[:, 1]**2)-(x[:, 0]*x[:, 1]))**self.c2*(self.c2*((1/((x[:, 0]**2+x[:, 1]**2)-(x[:, 0]*x[:, 1])))*((x[:, 1]**2*(2*(1/x[:, 1])))-x[:, 0]))))
+		grad[:, 0, 2] = 1
+
+		return grad
+
+class Zettl(Function):
+	"""
+	Zettl [https://infinity77.net/global_optimization/test_functions_nd_Z.html#go_benchmark.Zettl]
+	"""
+	def __init__(self, c1=0.25, c2=2, name="Zettl"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-1, 5], [-1, 5]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1 x_{1} + \left(x_{1}^{2} - c_2 x_{1} + x_{2}^{2}\right)^{2}
+
+
+		Default constant values are :math:`c = (0.25, 2)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((self.c1*x[:, 0])+((x[:, 0]**2-(self.c2*x[:, 0]))+x[:, 1]**2)**2).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = self.c1+(((x[:, 0]**2-(self.c2*x[:, 0]))+x[:, 1]**2)**2*(2*((1/((x[:, 0]**2-(self.c2*x[:, 0]))+x[:, 1]**2))*((x[:, 0]**2*(2*(1/x[:, 0])))-self.c2))))
+		grad[:, 0, 1] = ((x[:, 0]**2-(self.c2*x[:, 0]))+x[:, 1]**2)**2*(2*((1/((x[:, 0]**2-(self.c2*x[:, 0]))+x[:, 1]**2))*(x[:, 1]**2*(2*(1/x[:, 1])))))
+
+		return grad
+
+class Zirilli(Function):
+	"""
+	Zirilli [https://infinity77.net/global_optimization/test_functions_nd_Z.html#go_benchmark.Zirilli]
+	"""
+	def __init__(self, c1=0.25, c2=0.5, c3=0.1, c4=0.5, name="Zirilli"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4 = c1, c2, c3, c4
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-10, 10], [-10, 10]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1x_1^4 - c_2x_1^2 + c_3x_1 + c_4x_2^2
+
+
+		Default constant values are :math:`c = (0.25, 0.5, 0.1, 0.5)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return ((((self.c1*x[:, 0]**4)-(self.c2*x[:, 0]**2))+(self.c3*x[:, 0]))+(self.c4*x[:, 1]**2)).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((self.c1*(x[:, 0]**4*(4*(1/x[:, 0]))))-(self.c2*(x[:, 0]**2*(2*(1/x[:, 0])))))+self.c3
+		grad[:, 0, 1] = self.c4*(x[:, 1]**2*(2*(1/x[:, 1])))
+
+		return grad
+
 # https://www.sfu.ca/~ssurjano/optimization.html, many local minima section,
 # excluding discontinuous functions
 

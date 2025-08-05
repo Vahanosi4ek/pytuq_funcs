@@ -25,10 +25,7 @@ def create_class(name, consts, domain_list,
 	for i, grad in enumerate(grad_code_list):
 		grad_str += f"\t\tgrad[:, 0, {i}] = {grad}\n"
 
-	code = fr'''import numpy as np
-from pytuq.func.func import Function
-
-class {name}(Function):
+	code = fr'''class {name}(Function):
 	"""
 	{name} [https://infinity77.net/global_optimization/test_functions_nd_{name[0]}.html#go_benchmark.{name}]
 	"""
