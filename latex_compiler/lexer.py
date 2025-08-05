@@ -9,6 +9,7 @@ class Tokens:
 	Rparen = ")"
 	Lbrace = "{"
 	Rbrace = "}"
+	Eq = "="
 	Num = "Num"
 	Var = "Var"
 	Func = "Func"
@@ -31,7 +32,7 @@ class Lexer:
 	def __init__(self, func_str):
 		self.func_str = func_str
 
-		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "frac"}
+		self.funcs = {"cos", "sin", "log", "exp", "sum", "prod", "sign", "abs", "frac", "sqrt"}
 		self.consts = {"pi"}
 
 	def get_tokens(self):
@@ -58,11 +59,11 @@ class Lexer:
 				i += 1
 				continue
 
-			if c == "(":
+			if c in "([":
 				tokens.append(Token(Tokens.Lparen))
 				i += 1
 				continue
-			if c == ")":
+			if c in ")]":
 				tokens.append(Token(Tokens.Rparen))
 				i += 1
 				continue
@@ -111,6 +112,8 @@ class Lexer:
 					tokens.append(Token(Tokens.Func, name))
 				elif name in self.consts:
 					tokens.append(Token(Tokens.Const, name))
+				elif name in ("left", "right"):
+					pass					
 				else:
 					raise Exception(f"Unknown function {name}. If it's a real numpy function or constant, add it into lexer.py in Lexer.__init__ and in codegen in the funcdict")
 				continue

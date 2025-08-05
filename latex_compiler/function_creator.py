@@ -1,5 +1,12 @@
-def create_class(name, consts, dim, outdim, domain_list,
-					description, latex, grad_code_list):
+from codegen import *
+from autograd import *
+
+def create_class(name, consts, domain_list,
+					description, latex, outdim=1):
+	func_code = codegen(latex)
+	dim = len(domain_list)
+	grad_code_list = autograd_nd(latex, dim)
+
 	consts1 = ""
 	for i, c in enumerate(consts):
 		consts1 += f"c{i + 1}={c}, "
@@ -39,17 +46,18 @@ class {name}(Function):
 
 		..math::
 			f(x)={latex}
+'''
+	if len(consts):
+		code += f"\n\n\t\tDefault constant values are :math:`c = {consts3}\n"
 
-
-		Default constant values are :math:`c = {consts3}
-		
+	code += f'''
 		Args:
 			x (np.ndarray): Input array :math:`x` of size `(N,{dim})`.
 
 		Returns:
 			np.ndarray: Output array of size `(N,{outdim})`.
 		"""
-		return ({latex}).reshape(-1, 1)
+		return ({func_code}).reshape(-1, 1)
 
 	def grad(self, x):
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
@@ -57,8 +65,5 @@ class {name}(Function):
 		return grad
 
 '''
-
-	with open("autogen.py", "w") as f:
-		f.write(code)
 
 	return code

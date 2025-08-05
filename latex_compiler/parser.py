@@ -24,6 +24,15 @@ class Parser:
 	def parse(self):
 		return self.add_sub()
 
+	def sum_sub(self):
+		self.advance()
+		var = self.cur
+		self.advance()
+		self.advance()
+		eq = EqNode(var, self.add_sub())
+
+		return eq
+
 	def tiny(self):
 		tok = self.cur
 		if tok.type == Tokens.Num:
@@ -43,7 +52,7 @@ class Parser:
 			self.advance()
 			return res
 		
-		if tok.type == Tokens.Func:
+		elif tok.type == Tokens.Func:
 			if tok.val == "frac":
 				self.advance()
 				self.advance()
@@ -75,7 +84,10 @@ class Parser:
 		if self.cur.type == Tokens.SubScript:
 			# char
 			if self.cur.val:
-				sub = NumNode(Token(Tokens.Num, self.cur.val))
+				try:
+					sub = NumNode(Token(Tokens.Num, int(float(self.cur.val))))
+				except ValueError:
+					sub = VarNode(Token(Tokens.Var, self.cur.val))
 			else:
 				self.advance() # go to the left brace
 				self.advance() # go to the first char

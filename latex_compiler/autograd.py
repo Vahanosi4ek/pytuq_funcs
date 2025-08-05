@@ -24,7 +24,7 @@ def configure_exponents(ast):
 
 # Configures ast to be with respect to x_{respect_no}
 def configure_ast_for_partial_derivative(ast, respect_no):
-	if isinstance(ast, SubSuperScriptNode) and isinstance(ast.node, VarNode) and ast.node.tok.val == "x" and ast.suffix_node.sub is not None and ast.suffix_node.sub.tok.val == respect_no:
+	if isinstance(ast, SubSuperScriptNode) and isinstance(ast.node, VarNode) and ast.node.tok.val == "x" and ast.suffix_node.sub is not None and int(ast.suffix_node.sub.tok.val) == respect_no:
 		if ast.suffix_node.super_:
 			return SubSuperScriptNode(ast.node, suffix_node=SuffixNode(super_=ast.suffix_node.super_))
 		else:
@@ -77,6 +77,9 @@ def ast_to_grad_ast_1d(ast):
 			elif func.val == "log":
 				return BinOp(BinOp(NumNode(Token(Tokens.Num, 1)), Token(Tokens.Div), arg), Token(Tokens.Mul), ast_to_grad_ast_1d(arg))
 
+			elif func.val == "sqrt":
+				return BinOp(BinOp(NumNode(Token(Tokens.Num, 1)), Token(Tokens.Div), BinOp(NumNode(Token(Tokens.Num, 2)), Token(Tokens.Mul), UnaryOp(Token(Tokens.Func, "sqrt"), VarNode(Token(Tokens.Var, "x"))))), Token(Tokens.Mul), ast_to_grad_ast_1d(arg))
+
 			elif func.val == "abs":
 				return BinOp((UnaryOp(Token(Tokens.Func, "sign"), arg)), Token(Tokens.Mul), ast_to_grad_ast_1d(arg))
 
@@ -122,6 +125,7 @@ def autograd_1d(latex):
 	ast = parser.parse()
 	configured_ast = configure_exponents(ast)
 	grad_ast = ast_to_grad_ast_1d(configured_ast)
+	grad_ast = optimize(grad_ast)
 
 	code = ast_to_code(grad_ast)
 	return code
@@ -134,10 +138,10 @@ def autograd_nd(latex, d):
 	ast = parser.parse()
 	configured_ast = configure_exponents(ast)
 	grad_ast = ast_to_grad_ast_nd(configured_ast, d)
-
 	res = []
 
 	for i in grad_ast:
-		res.append(ast_to_code(i))
+		optim = optimize(i)
+		res.append(ast_to_code(optim))
 
 	return res

@@ -8,9 +8,6 @@ from pytuq.func.func import Function
 # https://infinity77.net/global_optimization/test_functions.html#test-functions-index
 # 1-d functions
 
-def _frac(a):
-	return lambda b: a / b
-
 class SineSum(Function):
 	"""
 	Problem 02 [https://infinity77.net/global_optimization/test_functions_1d.html#go_benchmark.Problem02]
@@ -893,12 +890,12 @@ class CarromTable(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-		return (-self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0).reshape(-1, 1)
+		return (-self.c1*np.exp(self.c2*np.abs(self.c3-(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))/(np.pi)))*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0).reshape(-1, 1)
 
 	def grad(self, x):
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
-		grad[:, 0, 0] = self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*self.c2*np.sign(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi))*_frac(1.0)(2.0*np.pi*np.sqrt(x[:, 0]**2.0+x[:, 1]**2.0))*2.0*x[:, 0]*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))(np.pi)))*2.0*np.cos(x[:, 0])*np.sin(x[:, 0])*np.cos(x[:, 1])**2.0
-		grad[:, 0, 1] = self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi)))*self.c2*np.sign(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi))*_frac(1.0)(2.0*np.pi*np.sqrt(x[:, 1]**2.0+x[:, 0]**2.0))*2.0*x[:, 1]*np.cos(x[:, 1])**2.0*np.cos(x[:, 0])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-_frac(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))(np.pi)))*2.0*np.cos(x[:, 1])*np.sin(x[:, 1])*np.cos(x[:, 0])**2.0
+		grad[:, 0, 0] = self.c1*np.exp(self.c2*np.abs(self.c3-(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))/(np.pi)))*self.c2*np.sign(self.c3-(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))/(np.pi))*(1.0)/(2.0*np.pi*np.sqrt(x[:, 0]**2.0+x[:, 1]**2.0))*2.0*x[:, 0]*np.cos(x[:, 0])**2.0*np.cos(x[:, 1])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-(np.sqrt(x[:, 0]**(2.0)+x[:, 1]**(2.0)))/(np.pi)))*2.0*np.cos(x[:, 0])*np.sin(x[:, 0])*np.cos(x[:, 1])**2.0
+		grad[:, 0, 1] = self.c1*np.exp(self.c2*np.abs(self.c3-(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))/(np.pi)))*self.c2*np.sign(self.c3-(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))/(np.pi))*(1.0)/(2.0*np.pi*np.sqrt(x[:, 1]**2.0+x[:, 0]**2.0))*2.0*x[:, 1]*np.cos(x[:, 1])**2.0*np.cos(x[:, 0])**2.0+self.c1*np.exp(self.c2*np.abs(self.c3-(np.sqrt(x[:, 1]**(2.0)+x[:, 0]**(2.0)))/(np.pi)))*2.0*np.cos(x[:, 1])*np.sin(x[:, 1])*np.cos(x[:, 0])**2.0
 
 		return grad
 
@@ -930,12 +927,12 @@ class Chichinadze(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-		return (x[:, 0]**(2.0)-self.c1*x[:, 0]+self.c2*np.sin(self.c3*np.pi*x[:, 0])+self.c4*np.cos(self.c5*np.pi*x[:, 0])+self.c6-_frac(self.c7)(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0)))).reshape(-1, 1)
+		return (x[:, 0]**(2.0)-self.c1*x[:, 0]+self.c2*np.sin(self.c3*np.pi*x[:, 0])+self.c4*np.cos(self.c5*np.pi*x[:, 0])+self.c6-(self.c7)/(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0)))).reshape(-1, 1)
 
 	def grad(self, x):
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
 		grad[:, 0, 0] = 2.0*x[:, 0]-self.c1+self.c2*self.c3*np.pi*np.cos(self.c3*np.pi*x[:, 0])-self.c4*self.c5*np.pi*np.sin(self.c5*np.pi*x[:, 0])
-		grad[:, 0, 1] = _frac(self.c7)(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))**2.0)*np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))*self.c8*2.0*(x[:, 1]-self.c9)
+		grad[:, 0, 1] = (self.c7)/(np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))**2.0)*np.exp(self.c8*(x[:, 1]-self.c9)**(2.0))*self.c8*2.0*(x[:, 1]-self.c9)
 
 		return grad
 
@@ -1003,14 +1000,14 @@ class Colville(Function):
 		Returns:
 			np.ndarray: Output array of size `(N,1)`.
 		"""
-		return ((x[:, 0]-self.c1)**(2.0)+self.c2*(x[:, 0]**(2.0)-x[:, 1])**(2.0)+self.c3*(x[:, 1]-self.c4)**(2.0)+(x[:, 2]-self.c5)**(2.0)+self.c6*(x[:, 2]**(2.0)-x[:, 3])**(2.0)+self.c7*(x[:, 3]-self.c8)**(2.0)+self.c9*_frac(x[:, 3]-self.c10)(x[:, 1])).reshape(-1, 1)
+		return ((x[:, 0]-self.c1)**(2.0)+self.c2*(x[:, 0]**(2.0)-x[:, 1])**(2.0)+self.c3*(x[:, 1]-self.c4)**(2.0)+(x[:, 2]-self.c5)**(2.0)+self.c6*(x[:, 2]**(2.0)-x[:, 3])**(2.0)+self.c7*(x[:, 3]-self.c8)**(2.0)+self.c9*(x[:, 3]-self.c10)/(x[:, 1])).reshape(-1, 1)
 
 	def grad(self, x):
 		grad = np.zeros((x.shape[0], self.outdim, self.dim))
 		grad[:, 0, 0] = 2.0*(x[:, 0]-self.c1)+self.c2*2.0*(x[:, 0]**2.0-x[:, 1])*2.0*x[:, 0]
-		grad[:, 0, 1] = -2.0*self.c2*(x[:, 0]**2.0-x[:, 1])+2.0*self.c3*(x[:, 1]-self.c4)-_frac(self.c9*(x[:, 3]-self.c10))(x[:, 1]**2.0)
+		grad[:, 0, 1] = -2.0*self.c2*(x[:, 0]**2.0-x[:, 1])+2.0*self.c3*(x[:, 1]-self.c4)-(self.c9*(x[:, 3]-self.c10))/(x[:, 1]**2.0)
 		grad[:, 0, 2] = 2.0*(x[:, 2]-self.c5)+2.0*self.c6*(x[:, 2]**2.0-x[:, 3])*2.0*x[:, 2]
-		grad[:, 0, 3] = -2.0*self.c6*(x[:, 2]**2.0-x[:, 3])+self.c7*2.0*(x[:, 3]-self.c8)+_frac(self.c9)(x[:, 1])
+		grad[:, 0, 3] = -2.0*self.c6*(x[:, 2]**2.0-x[:, 3])+self.c7*2.0*(x[:, 3]-self.c8)+(self.c9)/(x[:, 1])
 
 		return grad
 
@@ -1099,6 +1096,80 @@ class CrossInTray(Function):
 
 		grad[:, 0, 0] = -self.c1 * self.c4 * (np.abs(np.sin(x1) * np.sin(x2) * np.exp(np.abs(self.c2 - dist / np.pi))) + self.c3) ** (self.c4 - 1) * inner_absx1
 		grad[:, 0, 1] = -self.c1 * self.c4 * (np.abs(np.sin(x1) * np.sin(x2) * np.exp(np.abs(self.c2 - dist / np.pi))) + self.c3) ** (self.c4 - 1) * inner_absx2
+
+		return grad
+
+class Damavandi(Function):
+	"""
+	Damavandi [https://infinity77.net/global_optimization/test_functions_nd_D.html#go_benchmark.Damavandi]
+	"""
+	def __init__(self, c1=1.0, c2=2.0, c3=2.0, c4=2.0, c5=2.0, c6=5.0, c7=2.0, c8=7.0, c9=2.0, c10=7.0, name="Damavandi"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2, self.c3, self.c4, self.c5, self.c6, self.c7, self.c8, self.c9, self.c10 = c1, c2, c3, c4, c5, c6, c7, c8, c9, c10
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[0.0, 14.0], [0.0, 14.0]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=\left[ c_1 - \abs{\frac{\sin[\pi(x_1-c_2)]\sin[\pi(x_2-c_3)]}{\pi^2(x_1-c_4)(x_2-c_5)}}^{c_6} \right] \left[c_7 + (x_1-c_8)^2 + c_9(x_2-c_{10})^2 \right]
+
+
+		Default constant values are :math:`c = (1.0, 2.0, 2.0, 2.0, 2.0, 5.0, 2.0, 7.0, 2.0, 7.0)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((self.c1)-((np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))**(self.c6)))*(((self.c7)+(((x[:, 0])-(self.c8))**2))+((self.c9)*(((x[:, 1])-(self.c10))**2)))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = ((-(((np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))**(self.c6))*((self.c6)*((1/(np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5))))))*((np.sign(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))*((((((np.cos(np.pi*((x[:, 0])-(self.c2))))*(np.pi*1))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))*(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5))))-(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))*(((np.pi**2)*1)*((x[:, 1])-(self.c5)))))/((((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))**2)))))))*(((self.c7)+(((x[:, 0])-(self.c8))**2))+((self.c9)*(((x[:, 1])-(self.c10))**2))))+(((self.c1)-((np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))**(self.c6)))*((((x[:, 0])-(self.c8))**2)*(2*((1/((x[:, 0])-(self.c8)))*1))))
+		grad[:, 0, 1] = ((-(((np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))**(self.c6))*((self.c6)*((1/(np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5))))))*((np.sign(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))*(((((np.sin(np.pi*((x[:, 0])-(self.c2))))*((np.cos(np.pi*((x[:, 1])-(self.c3))))*(np.pi*1)))*(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5))))-(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))*(((np.pi**2)*((x[:, 0])-(self.c4)))*1)))/((((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))**2)))))))*(((self.c7)+(((x[:, 0])-(self.c8))**2))+((self.c9)*(((x[:, 1])-(self.c10))**2))))+(((self.c1)-((np.abs(((np.sin(np.pi*((x[:, 0])-(self.c2))))*(np.sin(np.pi*((x[:, 1])-(self.c3)))))/(((np.pi**2)*((x[:, 0])-(self.c4)))*((x[:, 1])-(self.c5)))))**(self.c6)))*((self.c9)*((((x[:, 1])-(self.c10))**2)*(2*((1/((x[:, 1])-(self.c10)))*1)))))
+
+		return grad
+
+class DeckkersAarts(Function):
+	"""
+	DeckkersAarts [https://infinity77.net/global_optimization/test_functions_nd_D.html#go_benchmark.DeckkersAarts]
+	"""
+	def __init__(self, c1=1000, c2=0.001, name="DeckkersAarts"):
+		super().__init__()
+		self.name = name
+		self.c1, self.c2 = c1, c2
+		self.dim = 2
+		self.outdim = 1
+
+		self.setDimDom(domain=np.array([[-20.0, 20.0], [-20.0, 20.0]]))
+
+	def __call__(self, x):
+		r"""A multimodal minimzation function
+
+		..math::
+			f(x)=c_1x_1^2 + x_2^2 - (x_1^2 + x_2^2)^2 + c_2(x_1^2 + x_2^2)^4
+
+
+		Default constant values are :math:`c = (1000, 0.001)
+
+		Args:
+			x (np.ndarray): Input array :math:`x` of size `(N,2)`.
+
+		Returns:
+			np.ndarray: Output array of size `(N,1)`.
+		"""
+		return (((((self.c1)*(x[:, 0]**2))+(x[:, 1]**2))-(((x[:, 0]**2)+(x[:, 1]**2))**2))+((self.c2)*(((x[:, 0]**2)+(x[:, 1]**2))**4))).reshape(-1, 1)
+
+	def grad(self, x):
+		grad = np.zeros((x.shape[0], self.outdim, self.dim))
+		grad[:, 0, 0] = (((self.c1)*(((x[:, 0])**2)*(2*((1/(x[:, 0]))*1))))-(((((x[:, 0])**2)+((x[:, 1])**2))**2)*(2*((1/(((x[:, 0])**2)+((x[:, 1])**2)))*(((x[:, 0])**2)*(2*((1/(x[:, 0]))*1)))))))+((self.c2)*(((((x[:, 0])**2)+((x[:, 1])**2))**4)*(4*((1/(((x[:, 0])**2)+((x[:, 1])**2)))*(((x[:, 0])**2)*(2*((1/(x[:, 0]))*1)))))))
+		grad[:, 0, 1] = ((((x[:, 1])**2)*(2*((1/(x[:, 1]))*1)))-(((((x[:, 0])**2)+((x[:, 1])**2))**2)*(2*((1/(((x[:, 0])**2)+((x[:, 1])**2)))*(((x[:, 1])**2)*(2*((1/(x[:, 1]))*1)))))))+((self.c2)*(((((x[:, 0])**2)+((x[:, 1])**2))**4)*(4*((1/(((x[:, 0])**2)+((x[:, 1])**2)))*(((x[:, 1])**2)*(2*((1/(x[:, 1]))*1)))))))
 
 		return grad
 

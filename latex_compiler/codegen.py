@@ -1,6 +1,7 @@
 from nodes import *
 from lexer import *
 from parser import *
+from optimizer import *
 
 func_dict = {
 	"sin": "np.sin",
@@ -11,6 +12,7 @@ func_dict = {
 	"sign": "np.sign",
 	"sum": "np.sum",
 	"prod": "np.prod",
+	"sqrt": "np.sqrt",
 }
 
 const_dict = {
@@ -18,7 +20,9 @@ const_dict = {
 }
 
 def parenify(node):
-	if not isinstance(node, (NumNode, VarNode)):
+	if isinstance(node, UnaryOp) and node.op_tok.type != Tokens.Sub:
+		return f"{ast_to_code(node)}"
+	if not isinstance(node, (NumNode, VarNode, SubSuperScriptNode)):
 		return f"({ast_to_code(node)})"
 	else:
 		return f"{ast_to_code(node)}"
@@ -33,10 +37,11 @@ def ast_to_code(ast):
 		if ast.suffix_node.sub:
 			if isinstance(ast.node, VarNode):
 				if ast.node.tok.val == "x":
-					code += parenify(ast.node) + f"[:, {int(ast.suffix_node.sub.tok.val) - 1}]"
+					code += parenify(ast.node) + f"[:, {int(float(ast.suffix_node.sub.tok.val)) - 1}]"
 
 				elif ast.node.tok.val == "c":
 					code += "self." + parenify(ast.node) + str(ast.suffix_node.sub.tok.val)
+
 		if ast.suffix_node.super_:
 			if not ast.suffix_node.sub:
 				code += f"{parenify(ast.node)}**{parenify(ast.suffix_node.super_)}"
@@ -58,7 +63,7 @@ def ast_to_code(ast):
 
 	elif isinstance(ast, BinOp):
 		code += f"{parenify(ast.left_node)}{ast.op_tok.type}{parenify(ast.right_node)}"
-	
+
 	return code
 
 def codegen(latex):
@@ -67,6 +72,6 @@ def codegen(latex):
 
 	parser = Parser(tokens)
 	ast = parser.parse()
-
-	code = ast_to_code(ast)
+	optim = optimize(ast)
+	code = ast_to_code(optim)
 	return code

@@ -13,7 +13,6 @@ myrc()
 fcns = [
 # From https://infinity77.net/global_optimization/test_functions.html
 # 1D
-    TestClass(),
     # SineSum(),
     # SineSum2(),
     # QuadxExp(),
@@ -40,10 +39,13 @@ fcns = [
     # Bukin04(),
     # Bukin6(),
     # CarromTable(),
-    Chichinadze(),
+    # Chichinadze(),
     # Cigar(),
     # Colville(),
     # CosineMixture(),
+    # Damavandi(),
+    # DeckkersAarts(),
+    Dolan(),
 
 # Many local minima (it's worth running these with higher sample points)
     # CrossInTray(),

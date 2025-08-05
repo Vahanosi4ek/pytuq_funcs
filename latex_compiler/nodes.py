@@ -8,6 +8,11 @@ class UnaryOp:
 
 	__str__ = __repr__
 
+	def __eq__(self, b):
+		if isinstance(b, UnaryOp):
+			return b.op_tok == self.op_tok and b.node == self.node
+		return False
+
 class BinOp:
 	def __init__(self, left_node, op_tok, right_node):
 		self.left_node = left_node
@@ -19,18 +24,27 @@ class BinOp:
 
 	__str__ = __repr__
 
+	def __eq__(self, b):
+		if isinstance(b, BinOp):
+			return b.op_tok == self.op_tok and b.left_node == self.left_node and b.right_node == self.right_node
+		return False
+
 class NumNode:
 	def __init__(self, tok):
 		self.tok = tok
-		self.tok.val = float(self.tok.val)
+		self.tok.val = int(float(self.tok.val))
 
-		if self.tok.val % 1 == 0:
-			self.tok.val = int(self.tok.val)
+		assert (self.tok.val >= 0)
 
 	def __repr__(self):
 		return f"NumNode({self.tok})"
 
 	__str__ = __repr__
+
+	def __eq__(self, b):
+		if isinstance(b, NumNode):
+			return int(b.tok.val) == int(self.tok.val)
+		return False
 
 class VarNode:
 	def __init__(self, tok):
@@ -40,6 +54,11 @@ class VarNode:
 		return f"VarNode({self.tok})"
 
 	__str__ = __repr__
+
+	def __eq__(self, b):
+		if isinstance(b, VarNode):
+			return b.tok.val == self.tok.val
+		return False
 
 class SuffixNode:
 	def __init__(self, sub=None, super_=None):
@@ -54,6 +73,11 @@ class SuffixNode:
 
 	__str__ = __repr__
 
+	def __eq__(self, b):
+		if isinstance(b, SuffixNode):
+			return self.sub == b.sub and self.super_ == b.super_
+		return False
+
 class SubSuperScriptNode:
 	def __init__(self, node, suffix_node=SuffixNode()):
 		self.node = node
@@ -61,3 +85,8 @@ class SubSuperScriptNode:
 
 	def __repr__(self):
 		return f"SubSuperScriptNode({self.node}, {self.suffix_node})"
+
+	def __eq__(self, b):
+		if isinstance(b, SubSuperScriptNode):
+			return self.node == b.node and self.suffix_node == b.suffix_node
+		return False
