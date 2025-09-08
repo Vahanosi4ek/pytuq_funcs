@@ -1,4 +1,6 @@
 *png
 autogen.py
 notes.txt
+benchmark_nn.py
+benchmark_nn_test.py
 *__pycache__
